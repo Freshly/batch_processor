@@ -1,4 +1,14 @@
+# frozen_string_literal: true
+
 require "bundler/setup"
+require "simplecov"
+
+require "rspice"
+
+SimpleCov.start do
+  add_filter "/spec/"
+end
+
 require "batch_processor"
 
 RSpec.configure do |config|
