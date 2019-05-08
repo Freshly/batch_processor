@@ -3,8 +3,9 @@
 require "active_support"
 require "active_job"
 
-require "batch_processor/version"
+require "technologic"
 
-module BatchProcessor
-  # Your code goes here...
-end
+require "batch_processor/version"
+require "batch_processor/batch_base"
+
+module BatchProcessor; end
