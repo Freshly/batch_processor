@@ -4,6 +4,7 @@ require "bundler/setup"
 require "simplecov"
 
 require "rspice"
+require "shoulda-matchers"
 
 SimpleCov.start do
   add_filter "/spec/"
@@ -20,5 +21,12 @@ RSpec.configure do |config|
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
+  end
+end
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :active_model
   end
 end
