@@ -1,0 +1,3 @@
+inherit_gem:
+  spicerack-styleguide:
+    - rubocop.yml

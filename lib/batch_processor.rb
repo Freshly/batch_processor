@@ -1,6 +1,10 @@
+# frozen_string_literal: true
+
+require "active_support"
+require "active_job"
+
 require "batch_processor/version"
 
 module BatchProcessor
-  class Error < StandardError; end
   # Your code goes here...
 end
