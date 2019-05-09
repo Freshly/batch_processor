@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Operations take a state as input.
+# A batch accepts input which may be used to generate the collection of data process.
 module BatchProcessor
   module Batch
     module Core

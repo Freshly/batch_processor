@@ -3,6 +3,7 @@
 require "active_support"
 require "active_job"
 
+require "short_circu_it"
 require "technologic"
 
 require "batch_processor/version"
