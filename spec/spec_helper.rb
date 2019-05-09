@@ -13,6 +13,8 @@ end
 
 require "batch_processor"
 
+require_relative "support/shared_context/with_an_example_batch"
+
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = ".rspec_status"
