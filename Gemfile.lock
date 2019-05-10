@@ -4,6 +4,7 @@ PATH
     batch_processor (0.1.0)
       activejob (~> 5.2.1)
       activesupport (~> 5.2.1)
+      redis (~> 4.0)
       spicerack (~> 0.7.4)
 
 GEM
@@ -83,6 +84,7 @@ GEM
       thor (>= 0.19.0, < 2.0)
     rainbow (3.0.0)
     rake (10.5.0)
+    redis (4.1.0)
     rspec (3.8.0)
       rspec-core (~> 3.8.0)
       rspec-expectations (~> 3.8.0)
@@ -151,8 +153,6 @@ DEPENDENCIES
   rake (~> 10.0)
   rspec (~> 3.0)
   rspice (~> 0.7.1)
-  rubocop (~> 0.68.1)
-  rubocop-rspec (~> 1.32.0)
   shoulda-matchers (= 4.0.1)
   simplecov (~> 0.16)
   spicerack-styleguide (~> 0.7.4)
