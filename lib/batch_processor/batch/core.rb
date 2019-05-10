@@ -7,11 +7,14 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       included do
-        attr_reader :input
+        attr_reader :id, :input
       end
 
-      def initialize(**input)
-        run_callbacks(:initialize) { @input = input }
+      def initialize(id = nil, **input)
+        run_callbacks(:initialize) do
+          @id = id
+          @input = input
+        end
       end
     end
   end
