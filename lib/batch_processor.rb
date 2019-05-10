@@ -3,6 +3,8 @@
 require "active_support"
 require "active_job"
 
+require "redis"
+
 require "short_circu_it"
 require "technologic"
 
