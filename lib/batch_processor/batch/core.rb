@@ -12,7 +12,7 @@ module BatchProcessor
 
       def initialize(id = nil, **input)
         run_callbacks(:initialize) do
-          @id = id
+          @id = id || SecureRandom.urlsafe_base64(10)
           @input = input
         end
       end
