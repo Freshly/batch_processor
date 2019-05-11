@@ -8,4 +8,5 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
   it { is_expected.to include_module BatchProcessor::Batch::Details::Callbacks }
   it { is_expected.to include_module BatchProcessor::Batch::Details::Core }
   it { is_expected.to include_module BatchProcessor::Batch::Details::RedisHash }
+  it { is_expected.to include_module BatchProcessor::Batch::Details::Status }
 end
