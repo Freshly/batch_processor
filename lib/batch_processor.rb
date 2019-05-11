@@ -10,5 +10,6 @@ require "technologic"
 
 require "batch_processor/version"
 require "batch_processor/batch_base"
+require "batch_processor/batch_details"
 
 module BatchProcessor; end

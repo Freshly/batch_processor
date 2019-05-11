@@ -10,7 +10,7 @@ module BatchProcessor
         include ActiveSupport::Callbacks
         define_callbacks :initialize
         define_callbacks_with_handler :job_started, :job_retrying, :job_performed, :job_canceled,
-                                      :batch_aborted, :batch_finished, :batch_success, :batch_errors, :batch_completed
+                                      :batch_aborted, :batch_finished, :batch_success, :batch_errored, :batch_completed
       end
 
       class_methods do
