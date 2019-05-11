@@ -14,6 +14,7 @@ end
 require "batch_processor"
 
 require_relative "support/shared_context/with_an_example_batch"
+require_relative "support/shared_context/with_example_details"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
