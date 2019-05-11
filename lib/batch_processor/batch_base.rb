@@ -3,7 +3,7 @@
 require_relative "batch/callbacks"
 require_relative "batch/core"
 require_relative "batch/collection"
-require_relative "batch/details"
+require_relative "batch/uniqueness"
 
 module BatchProcessor
   class BatchBase
@@ -12,6 +12,6 @@ module BatchProcessor
     include BatchProcessor::Batch::Callbacks
     include BatchProcessor::Batch::Core
     include BatchProcessor::Batch::Collection
-    include BatchProcessor::Batch::Details
+    include BatchProcessor::Batch::Uniqueness
   end
 end

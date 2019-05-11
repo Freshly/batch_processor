@@ -3,11 +3,12 @@
 # A batch defines a collection of data to process.
 module BatchProcessor
   module Batch
-    module Details
+    module Uniqueness
       extend ActiveSupport::Concern
 
       included do
         memoize :details
+        set_callback(:initialize, :after) { raise BatchProcessor::ExistingBatchError if details.persisted? }
       end
 
       def details
