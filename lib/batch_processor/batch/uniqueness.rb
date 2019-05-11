@@ -1,18 +1,15 @@
 # frozen_string_literal: true
 
-# A batch defines a collection of data to process.
+# A batch ID must be unique across all known batches.
 module BatchProcessor
   module Batch
     module Uniqueness
       extend ActiveSupport::Concern
 
       included do
-        memoize :details
-        set_callback(:initialize, :after) { raise BatchProcessor::ExistingBatchError if details.persisted? }
-      end
-
-      def details
-        BatchProcessor::BatchDetails.new(id)
+        set_callback(:initialize, :after) do
+          raise BatchProcessor::ExistingBatchError if details.persisted? && input.present?
+        end
       end
     end
   end
