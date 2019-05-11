@@ -7,12 +7,13 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       included do
-        attr_reader :id, :input
+        attr_reader :id, :details, :input
       end
 
       def initialize(id = nil, **input)
         run_callbacks(:initialize) do
           @id = id || SecureRandom.urlsafe_base64(10)
+          @details = BatchProcessor::BatchDetails.new(@id)
           @input = input
         end
       end

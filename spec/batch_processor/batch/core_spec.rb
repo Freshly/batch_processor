@@ -20,6 +20,11 @@ RSpec.describe BatchProcessor::Batch::Core, type: :module do
         end
       end
 
+      it "defines details" do
+        expect(instance.details).to be_an_instance_of BatchProcessor::BatchDetails
+        expect(instance.details.batch_id).to eq instance.id
+      end
+
       it "stores input" do
         expect(instance.input).to eq expected_input
       end

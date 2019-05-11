@@ -3,9 +3,21 @@
 RSpec.describe BatchProcessor::Batch::Uniqueness, type: :module do
   include_context "with an example batch", described_class
 
-  describe "#details" do
-    subject { example_batch.details }
+  context "with existing batch" do
+    before { Redis.new.hset("BatchProcessor:#{id}", "key", "value") }
 
-    it { is_expected.to be_an_instance_of BatchProcessor::BatchDetails }
+    context "with input" do
+      let(:input) { Hash[*Faker::Lorem.words(2 * rand(1..2))].symbolize_keys }
+
+      it "raises" do
+        expect { example_batch }.to raise_error BatchProcessor::ExistingBatchError
+      end
+    end
+
+    context "without input" do
+      it "does not raise" do
+        expect { example_batch }.not_to raise_error
+      end
+    end
   end
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.shared_context "with an example batch" do |extra_batch_modules = nil|
-  subject(:example_batch) { example_batch_class.new(**input) }
+  subject(:example_batch) { example_batch_class.new(id, **input) }
 
   let(:root_batch_modules) do
     [ ShortCircuIt, Technologic, BatchProcessor::Batch::Callbacks, BatchProcessor::Batch::Core ]
@@ -15,6 +15,7 @@ RSpec.shared_context "with an example batch" do |extra_batch_modules = nil|
     end
   end
 
+  let(:id) { SecureRandom.hex }
   let(:input) do
     {}
   end
