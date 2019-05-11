@@ -18,9 +18,14 @@ module BatchProcessor
           attr_reader :redis_hash
         end
 
+        def persisted?
+          redis_hash.present?
+        end
+
         def reload_redis_hash
           @redis_hash = redis.hgetall(redis_key)
         end
+        alias_method :reload, :reload_redis_hash
 
         def redis_key
           "BatchProcessor:#{batch_id}"

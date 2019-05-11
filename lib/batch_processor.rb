@@ -12,4 +12,8 @@ require "batch_processor/version"
 require "batch_processor/batch_base"
 require "batch_processor/batch_details"
 
-module BatchProcessor; end
+module BatchProcessor
+  class Error < StandardError; end
+
+  class ExistingBatchError < Error; end
+end

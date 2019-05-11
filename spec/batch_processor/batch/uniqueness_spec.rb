@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe BatchProcessor::Batch::Details, type: :module do
+RSpec.describe BatchProcessor::Batch::Uniqueness, type: :module do
   include_context "with an example batch", described_class
 
   describe "#details" do

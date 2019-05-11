@@ -3,6 +3,8 @@
 RSpec.describe BatchProcessor::Batch::Details::RedisHash, type: :module do
   include_context "with example details", described_class
 
+  it { is_expected.to alias_method :reload, :reload_redis_hash }
+
   describe "#redis" do
     subject { example_details.redis }
 
@@ -13,6 +15,26 @@ RSpec.describe BatchProcessor::Batch::Details::RedisHash, type: :module do
     subject { example_details.redis_key }
 
     it { is_expected.to eq "BatchProcessor:#{batch_id}" }
+  end
+
+  describe "#persisted?" do
+    subject { example_details.persisted? }
+
+    before { allow(example_details).to receive(:redis_hash).and_return(redis_hash) }
+
+    context "with #redis_hash" do
+      let(:redis_hash) do
+        { present: true }
+      end
+
+      it { is_expected.to eq true }
+    end
+
+    context "without #redis_hash" do
+      let(:redis_hash) { {} }
+
+      it { is_expected.to eq false }
+    end
   end
 
   describe "#redis_hash" do
