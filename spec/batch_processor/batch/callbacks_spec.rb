@@ -14,7 +14,7 @@ RSpec.describe BatchProcessor::Batch::Callbacks, type: :module do
     batch_aborted
     batch_finished
     batch_success
-    batch_errors
+    batch_errored
     batch_completed
   ]
 
@@ -62,8 +62,8 @@ RSpec.describe BatchProcessor::Batch::Callbacks, type: :module do
     it_behaves_like "a handler for the callback", :batch_success
   end
 
-  describe "#on_batch_errors" do
-    it_behaves_like "a handler for the callback", :batch_errors
+  describe "#on_batch_errored" do
+    it_behaves_like "a handler for the callback", :batch_errored
   end
 
   describe "#on_batch_completed" do
