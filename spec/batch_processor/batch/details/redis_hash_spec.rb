@@ -75,5 +75,89 @@ RSpec.describe BatchProcessor::Batch::Details::RedisHash, type: :module do
       Redis.new.hset("BatchProcessor:#{batch_id}", new_hash_key, new_hash_value)
       expect { reload_redis_hash }.to change { example_details.redis_hash }.from(original_hash).to(new_hash)
     end
+
+    it { is_expected.to eq example_details }
+  end
+
+  shared_examples_for "the value is set in memory and redis" do
+    it "writes to redis and in memory field" do
+      expect { subject }.
+        to change { Redis.new.hget("BatchProcessor:#{batch_id}", field) }.from(existing_value).to(value).
+        and change { example_details.redis_hash[field] }.from(existing_value).to(value)
+    end
+  end
+
+  describe "#[]=" do
+    subject(:bracket_assignment) { example_details[field] = value }
+
+    let(:field) { SecureRandom.hex }
+    let(:value) { SecureRandom.hex }
+
+    let(:existing_value) { nil }
+
+    context "without existing value" do
+      it_behaves_like "the value is set in memory and redis"
+    end
+
+    context "with existing value" do
+      let(:existing_value) { SecureRandom.hex }
+
+      before { Redis.new.hset("BatchProcessor:#{batch_id}", field, existing_value) }
+
+      it_behaves_like "the value is set in memory and redis"
+    end
+  end
+
+  describe "#merge" do
+    let(:field1) { SecureRandom.hex }
+    let(:value1) { SecureRandom.hex }
+    let(:field2) { SecureRandom.hex }
+    let(:value2) { SecureRandom.hex }
+
+    shared_examples_for "the values are merged" do
+      context "without existing value" do
+        let(:existing_value) { nil }
+
+        it_behaves_like "the value is set in memory and redis" do
+          let(:field) { field1 }
+          let(:value) { value1 }
+        end
+
+        it_behaves_like "the value is set in memory and redis" do
+          let(:field) { field2 }
+          let(:value) { value2 }
+        end
+      end
+
+      context "with existing value" do
+        let(:existing_value1) { SecureRandom.hex }
+
+        before { Redis.new.hset("BatchProcessor:#{batch_id}", field1, existing_value1) }
+
+        it_behaves_like "the value is set in memory and redis" do
+          let(:field) { field1 }
+          let(:value) { value1 }
+          let(:existing_value) { existing_value1 }
+        end
+
+        it_behaves_like "the value is set in memory and redis" do
+          let(:field) { field2 }
+          let(:value) { value2 }
+          let(:existing_value) { nil }
+        end
+      end
+    end
+
+    context "with kwargs" do
+      subject(:merge) { example_details.merge(**{ field1 => value1, field2 => value2 }.symbolize_keys) }
+
+      it_behaves_like "the values are merged"
+    end
+
+    context "with hash" do
+      subject(:merge) { example_details.merge(field1 => value1, field2 => value2) }
+
+      it_behaves_like "the values are merged"
+    end
   end
 end

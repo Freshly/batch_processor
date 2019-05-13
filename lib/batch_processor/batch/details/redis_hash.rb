@@ -22,8 +22,19 @@ module BatchProcessor
           redis_hash.present?
         end
 
+        def []=(field, value)
+          redis.hset(redis_key, field, value)
+          @redis_hash[field.to_s] = value
+        end
+
+        def merge(*args)
+          hash = args.extract_options!.merge(args.first.try(:to_h) || {})
+          redis.pipelined { hash.each { |key, value| self[key] = value } }
+        end
+
         def reload_redis_hash
           @redis_hash = redis.hgetall(redis_key)
+          self
         end
         alias_method :reload, :reload_redis_hash
 
