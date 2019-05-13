@@ -5,6 +5,7 @@ require "active_job"
 
 require "redis"
 
+require "instructor"
 require "short_circu_it"
 require "technologic"
 

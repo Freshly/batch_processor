@@ -7,7 +7,7 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       included do
-        attr_reader :id, :details, :input
+        attr_reader :id, :details
       end
 
       def initialize(id = nil, **input)
@@ -16,9 +16,7 @@ module BatchProcessor
 
         raise BatchProcessor::ExistingBatchError if details.persisted? && input.present?
 
-        run_callbacks(:initialize) do
-          @input = input
-        end
+        super(**input)
       end
     end
   end

@@ -5,9 +5,7 @@ require_relative "batch/core"
 require_relative "batch/collection"
 
 module BatchProcessor
-  class BatchBase
-    include ShortCircuIt
-    include Technologic
+  class BatchBase < Instructor::Base
     include BatchProcessor::Batch::Callbacks
     include BatchProcessor::Batch::Core
     include BatchProcessor::Batch::Collection
