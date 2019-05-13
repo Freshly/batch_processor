@@ -2,11 +2,14 @@
 
 RSpec.describe BatchProcessor::Batch::Core, type: :module do
   describe "#initialize" do
-    include_context "with example class having callback", :initialize
+    include_context "with an example batch"
+
+    before { example_batch_class.__send__(:option, :test_attribute1) }
 
     let(:id) { SecureRandom.hex }
-    let(:input) { Hash[*Faker::Lorem.words(4)].symbolize_keys }
-    let(:example_class) { example_class_having_callback.include(described_class) }
+    let(:input) do
+      { test_attribute1: :test_value1 }
+    end
 
     shared_examples_for "an instance" do
       let(:expected_id) { :default }
@@ -14,30 +17,30 @@ RSpec.describe BatchProcessor::Batch::Core, type: :module do
 
       it "has an id always" do
         if expected_id == :default
-          expect(instance.id).not_to be_nil
+          expect(example_batch.id).not_to be_nil
         else
-          expect(instance.id).to eq expected_id
+          expect(example_batch.id).to eq expected_id
         end
       end
 
       it "defines details" do
-        expect(instance.details).to be_an_instance_of BatchProcessor::BatchDetails
-        expect(instance.details.batch_id).to eq instance.id
+        expect(example_batch.details).to be_an_instance_of BatchProcessor::BatchDetails
+        expect(example_batch.details.batch_id).to eq example_batch.id
       end
 
       it "stores input" do
-        expect(instance.input).to eq expected_input
+        expect(example_batch.input).to eq expected_input
       end
     end
 
     context "with no arguments" do
-      subject(:instance) { example_class.new }
+      subject(:example_batch) { example_batch_class.new }
 
       it_behaves_like "an instance"
     end
 
     context "with only an id" do
-      subject(:instance) { example_class.new(id) }
+      subject(:example_batch) { example_batch_class.new(id) }
 
       it_behaves_like "an instance" do
         let(:expected_id) { id }
@@ -45,7 +48,7 @@ RSpec.describe BatchProcessor::Batch::Core, type: :module do
     end
 
     context "with only input" do
-      subject(:instance) { example_class.new(**input) }
+      subject(:example_batch) { example_batch_class.new(**input) }
 
       it_behaves_like "an instance" do
         let(:expected_input) { input }
@@ -53,13 +56,13 @@ RSpec.describe BatchProcessor::Batch::Core, type: :module do
     end
 
     context "with id and input" do
-      subject(:instance) { example_class.new(id, **input) }
+      subject(:example_batch) { example_batch_class.new(id, **input) }
 
       context "with existing batch" do
         before { Redis.new.hset("BatchProcessor:#{id}", "key", "value") }
 
         it "raises" do
-          expect { instance }.to raise_error BatchProcessor::ExistingBatchError
+          expect { example_batch }.to raise_error BatchProcessor::ExistingBatchError
         end
       end
 
@@ -69,12 +72,6 @@ RSpec.describe BatchProcessor::Batch::Core, type: :module do
           let(:expected_input) { input }
         end
       end
-    end
-
-    it_behaves_like "a class with callback" do
-      subject(:callback_runner) { example_class.new }
-
-      let(:example) { example_class }
     end
   end
 end

@@ -6,7 +6,6 @@ RSpec.describe BatchProcessor::Batch::Callbacks, type: :module do
   it { is_expected.to include_module ActiveSupport::Callbacks }
 
   it_behaves_like "an example class with callbacks", described_class, %i[
-    initialize
     job_started
     job_retrying
     job_performed
