@@ -11,9 +11,12 @@ module BatchProcessor
       end
 
       def initialize(id = nil, **input)
+        @id = id || SecureRandom.urlsafe_base64(10)
+        @details = BatchProcessor::BatchDetails.new(@id)
+
+        raise BatchProcessor::ExistingBatchError if details.persisted? && input.present?
+
         run_callbacks(:initialize) do
-          @id = id || SecureRandom.urlsafe_base64(10)
-          @details = BatchProcessor::BatchDetails.new(@id)
           @input = input
         end
       end
