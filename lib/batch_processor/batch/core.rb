@@ -7,14 +7,14 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       included do
-        attr_reader :id, :details
+        attr_reader :id#, :details
       end
 
       def initialize(id = nil, **input)
         @id = id || SecureRandom.urlsafe_base64(10)
-        @details = BatchProcessor::BatchDetails.new(@id)
-
-        raise BatchProcessor::ExistingBatchError if details.persisted? && input.present?
+        # @details = BatchProcessor::BatchDetails.new
+        #
+        # raise BatchProcessor::ExistingBatchError if details.any? && input.present?
 
         super(**input)
       end
