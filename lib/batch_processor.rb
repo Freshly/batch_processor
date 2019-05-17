@@ -3,11 +3,8 @@
 require "active_support"
 require "active_job"
 
-require "redis"
-
 require "instructor"
-require "short_circu_it"
-require "technologic"
+require "redis_hash"
 
 require "batch_processor/version"
 require "batch_processor/batch_base"
