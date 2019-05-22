@@ -8,54 +8,44 @@ RSpec.describe BatchProcessor::Batch::Worker, type: :module do
   describe ".process_with" do
     subject(:process_with) { example_batch_class.__send__(:process_with, worker_class) }
 
-    context "with a non-class" do
-      let(:worker_class) { :worker_class }
+    context "without #perform_now" do
+      let(:worker_class) { Class.new }
 
       it "raises" do
-        expect { process_with }.to raise_error TypeError, "worker_class must be a Class"
+        expect { process_with }.to raise_error ArgumentError, "worker_class must define .perform_now"
       end
     end
 
-    context "with a class" do
-      context "without #perform_now" do
-        let(:worker_class) { Class.new }
+    context "with #perform_now" do
+      context "without #perform_later" do
+        let(:worker_class) do
+          Class.new do
+            class << self
+              def perform_now; end
+            end
+          end
+        end
 
         it "raises" do
-          expect { process_with }.to raise_error ArgumentError, "worker_class must define .perform_now"
+          expect { process_with }.to raise_error ArgumentError, "worker_class must define .perform_later"
         end
       end
 
-      context "with #perform_now" do
-        context "without #perform_later" do
-          let(:worker_class) do
-            Class.new do
-              class << self
-                def perform_now; end
-              end
+      context "with #perform_later" do
+        let(:worker_class) do
+          Class.new do
+            class << self
+              def perform_now; end
+              def perform_later; end
             end
-          end
-
-          it "raises" do
-            expect { process_with }.to raise_error ArgumentError, "worker_class must define .perform_later"
           end
         end
 
-        context "with #perform_later" do
-          let(:worker_class) do
-            Class.new do
-              class << self
-                def perform_now; end
-                def perform_later; end
-              end
-            end
-          end
-
-          it "sets @worker_class" do
-            expect { process_with }.
-              to change { example_batch_class.instance_variable_get(:@worker_class) }.
-              from(nil).
-              to(worker_class)
-          end
+        it "sets @worker_class" do
+          expect { process_with }.
+            to change { example_batch_class.instance_variable_get(:@worker_class) }.
+            from(nil).
+            to(worker_class)
         end
       end
     end

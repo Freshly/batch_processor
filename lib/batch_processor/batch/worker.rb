@@ -14,7 +14,6 @@ module BatchProcessor
         private
 
         def process_with(worker_class)
-          raise TypeError, "worker_class must be a Class" unless worker_class.is_a?(Class)
           raise ArgumentError, "worker_class must define .perform_now" unless worker_class.respond_to?(:perform_now)
           raise ArgumentError, "worker_class must define .perform_later" unless worker_class.respond_to?(:perform_later)
 
