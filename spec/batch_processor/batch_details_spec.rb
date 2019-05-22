@@ -23,7 +23,18 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
   it { is_expected.to define_field :retried_jobs_count, :integer }
   it { is_expected.to define_field :cleared_jobs_count, :integer }
 
-  # TODO: it { is_expected.to allow_key :began_at }
+  it { is_expected.to allow_key :began_at }
+  it { is_expected.to allow_key :enqueued_at }
+  it { is_expected.to allow_key :aborted_at }
+  it { is_expected.to allow_key :ended_at }
+  it { is_expected.to allow_key :enqueued_jobs_count }
+  it { is_expected.to allow_key :pending_jobs_count }
+  it { is_expected.to allow_key :running_jobs_count }
+  it { is_expected.to allow_key :successful_jobs_count }
+  it { is_expected.to allow_key :failed_jobs_count }
+  it { is_expected.to allow_key :canceled_jobs_count }
+  it { is_expected.to allow_key :retried_jobs_count }
+  it { is_expected.to allow_key :cleared_jobs_count }
 
   describe "#batch_id" do
     subject { batch_details.batch_id }
