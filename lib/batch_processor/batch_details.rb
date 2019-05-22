@@ -22,13 +22,17 @@ module BatchProcessor
     field :retried_jobs_count, :integer
     field :cleared_jobs_count, :integer
 
-    delegate :name, to: :class, prefix: true
-
     allow_keys _fields
+
+    class << self
+      def redis_key_for_batch_id(batch_id)
+        "#{name}::#{batch_id}"
+      end
+    end
 
     def initialize(batch_id)
       @batch_id = batch_id
-      super redis_key: "#{class_name}::#{batch_id}"
+      super redis_key: self.class.redis_key_for_batch_id(batch_id)
     end
   end
 end

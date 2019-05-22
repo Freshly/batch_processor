@@ -58,13 +58,13 @@ RSpec.describe BatchProcessor::Batch::Core, type: :module do
     context "with id and input" do
       subject(:example_batch) { example_batch_class.new(id, **input) }
 
-      # context "with existing batch" do
-      #   before { Redis.new.hset("BatchProcessor:#{id}", "key", "value") }
-      #
-      #   it "raises" do
-      #     expect { example_batch }.to raise_error BatchProcessor::ExistingBatchError
-      #   end
-      # end
+      context "with existing batch" do
+        before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(id), "enqueued_jobs_count", "1") }
+
+        it "raises" do
+          expect { example_batch }.to raise_error BatchProcessor::ExistingBatchError
+        end
+      end
 
       context "without existing batch" do
         it_behaves_like "an instance" do
