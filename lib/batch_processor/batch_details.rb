@@ -2,11 +2,11 @@
 
 module BatchProcessor
   class BatchDetails < RedisHash::Base
-    include Tablesalt::HashModel
+    include Spicerack::HashModel
 
     attr_reader :batch_id
 
-    alias_method :hash, :itself
+    alias_method :data, :itself
 
     field :began_at, :datetime
     field :enqueued_at, :datetime
@@ -23,6 +23,8 @@ module BatchProcessor
     field :cleared_jobs_count, :integer
 
     delegate :name, to: :class, prefix: true
+
+    allow_keys _fields
 
     def initialize(batch_id)
       @batch_id = batch_id

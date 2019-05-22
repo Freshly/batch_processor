@@ -1,17 +1,45 @@
 # frozen_string_literal: true
 
 RSpec.describe BatchProcessor::BatchDetails, type: :batch do
-  subject { described_class }
+  subject(:batch_details) { described_class.new(batch_id) }
 
-  let(:instance) { described_class.new(batch_id) }
   let(:batch_id) { SecureRandom.hex }
 
   it { is_expected.to inherit_from RedisHash::Base }
-  it { is_expected.to include_module Tablesalt::HashModel }
+  it { is_expected.to include_module Spicerack::HashModel }
 
-  describe "#hash" do
-    subject(:hash) { instance.hash }
+  it { is_expected.to delegate_method(:name).to(:class).with_prefix }
 
-    it { is_expected.to be_a described_class }
+  it { is_expected.to define_field :began_at, :datetime }
+  it { is_expected.to define_field :enqueued_at, :datetime }
+  it { is_expected.to define_field :aborted_at, :datetime }
+  it { is_expected.to define_field :ended_at, :datetime }
+  it { is_expected.to define_field :enqueued_jobs_count, :integer }
+  it { is_expected.to define_field :pending_jobs_count, :integer }
+  it { is_expected.to define_field :running_jobs_count, :integer }
+  it { is_expected.to define_field :successful_jobs_count, :integer }
+  it { is_expected.to define_field :failed_jobs_count, :integer }
+  it { is_expected.to define_field :canceled_jobs_count, :integer }
+  it { is_expected.to define_field :retried_jobs_count, :integer }
+  it { is_expected.to define_field :cleared_jobs_count, :integer }
+
+  # TODO: it { is_expected.to allow_key :began_at }
+
+  describe "#batch_id" do
+    subject { batch_details.batch_id }
+
+    it { is_expected.to eq batch_id }
+  end
+
+  describe "#data" do
+    subject { batch_details.data }
+
+    it { is_expected.to eq batch_details }
+  end
+
+  describe "#redis_key" do
+    subject { batch_details.redis_key }
+
+    it { is_expected.to eq "#{described_class}::#{batch_id}" }
   end
 end
