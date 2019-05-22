@@ -8,8 +8,6 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
   it { is_expected.to inherit_from RedisHash::Base }
   it { is_expected.to include_module Spicerack::HashModel }
 
-  it { is_expected.to delegate_method(:name).to(:class).with_prefix }
-
   it { is_expected.to define_field :began_at, :datetime }
   it { is_expected.to define_field :enqueued_at, :datetime }
   it { is_expected.to define_field :aborted_at, :datetime }
@@ -50,6 +48,12 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
 
   describe "#redis_key" do
     subject { batch_details.redis_key }
+
+    it { is_expected.to eq described_class.redis_key_for_batch_id(batch_id) }
+  end
+
+  describe ".redis_key_for_batch_id" do
+    subject { described_class.redis_key_for_batch_id(batch_id) }
 
     it { is_expected.to eq "#{described_class}::#{batch_id}" }
   end
