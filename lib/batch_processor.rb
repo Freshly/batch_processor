@@ -3,8 +3,7 @@
 require "active_support"
 require "active_job"
 
-require "instructor"
-require "redis_hash"
+require "spicerack"
 
 require "batch_processor/version"
 require "batch_processor/batch_base"

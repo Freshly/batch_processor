@@ -2,6 +2,33 @@
 
 module BatchProcessor
   class BatchDetails < RedisHash::Base
-    # TODO...
+    include Spicerack::HashModel
+
+    attr_reader :batch_id
+
+    alias_method :data, :itself
+
+    field :began_at, :datetime
+    field :enqueued_at, :datetime
+    field :aborted_at, :datetime
+    field :ended_at, :datetime
+
+    field :enqueued_jobs_count, :integer
+    field :pending_jobs_count, :integer
+    field :running_jobs_count, :integer
+    field :successful_jobs_count, :integer
+    field :failed_jobs_count, :integer
+    field :canceled_jobs_count, :integer
+    field :retried_jobs_count, :integer
+    field :cleared_jobs_count, :integer
+
+    delegate :name, to: :class, prefix: true
+
+    allow_keys _fields
+
+    def initialize(batch_id)
+      @batch_id = batch_id
+      super redis_key: "#{class_name}::#{batch_id}"
+    end
   end
 end

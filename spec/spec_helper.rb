@@ -4,7 +4,7 @@ require "bundler/setup"
 require "pry"
 require "simplecov"
 
-require "rspice"
+require "spicerack/spec_helper"
 require "shoulda-matchers"
 
 SimpleCov.start do
