@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# The details of a batch represent the state of the work to process.
 module BatchProcessor
   class BatchDetails < RedisHash::Base
     include Spicerack::HashModel
