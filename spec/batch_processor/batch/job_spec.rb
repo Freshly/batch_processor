@@ -3,9 +3,7 @@
 RSpec.describe BatchProcessor::Batch::Job, type: :module do
   include_context "with an example batch", described_class
 
-  let(:batchable_job_class) do
-    Class.new.tap { |klass| klass.include BatchProcessor::BatchableJob }
-  end
+  let(:batchable_job_class) { Class.new(BatchProcessor::BatchableJob) }
 
   it { is_expected.to delegate_method(:job_class).to(:class) }
 
