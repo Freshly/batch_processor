@@ -9,7 +9,19 @@ RSpec.describe BatchProcessor do
     it { is_expected.to inherit_from StandardError }
   end
 
-  describe described_class::ExistingBatchError do
+  describe described_class::BatchError do
     it { is_expected.to inherit_from BatchProcessor::Error }
+  end
+
+  describe described_class::ProcessorError do
+    it { is_expected.to inherit_from BatchProcessor::Error }
+  end
+
+  describe described_class::ExistingBatchError do
+    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  end
+
+  describe described_class::BatchEmptyError do
+    it { is_expected.to inherit_from BatchProcessor::ProcessorError }
   end
 end
