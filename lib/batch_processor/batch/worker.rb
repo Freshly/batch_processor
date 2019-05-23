@@ -14,10 +14,13 @@ module BatchProcessor
         private
 
         def process_with(worker_class)
-          raise ArgumentError, "worker_class must define .perform_now" unless worker_class.respond_to?(:perform_now)
-          raise ArgumentError, "worker_class must define .perform_later" unless worker_class.respond_to?(:perform_later)
+          raise ArgumentError, "worker must define .perform_now and .perform_later" unless valid_worker?(worker_class)
 
           @worker_class = worker_class
+        end
+
+        def valid_worker?(worker_class)
+          worker_class.respond_to?(:perform_now) && worker_class.respond_to?(:perform_later)
         end
 
         def worker_class

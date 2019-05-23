@@ -8,12 +8,16 @@ RSpec.describe BatchProcessor::Batch::Worker, type: :module do
   describe ".process_with" do
     subject(:process_with) { example_batch_class.__send__(:process_with, worker_class) }
 
+    shared_examples_for "an invalid worker" do
+      it "raises" do
+        expect { process_with }.to raise_error ArgumentError, "worker must define .perform_now and .perform_later"
+      end
+    end
+
     context "without #perform_now" do
       let(:worker_class) { Class.new }
 
-      it "raises" do
-        expect { process_with }.to raise_error ArgumentError, "worker_class must define .perform_now"
-      end
+      it_behaves_like "an invalid worker"
     end
 
     context "with #perform_now" do
@@ -26,9 +30,7 @@ RSpec.describe BatchProcessor::Batch::Worker, type: :module do
           end
         end
 
-        it "raises" do
-          expect { process_with }.to raise_error ArgumentError, "worker_class must define .perform_later"
-        end
+        it_behaves_like "an invalid worker"
       end
 
       context "with #perform_later" do
