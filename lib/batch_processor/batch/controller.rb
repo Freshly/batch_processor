@@ -18,7 +18,7 @@ module BatchProcessor
           details.size = collection.size
         end
 
-        true
+        started?
       end
 
       def finish
@@ -27,7 +27,7 @@ module BatchProcessor
 
         details.finished_at = Time.current
 
-        true
+        finished?
       end
     end
   end
