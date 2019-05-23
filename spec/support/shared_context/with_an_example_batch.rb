@@ -3,9 +3,7 @@
 RSpec.shared_context "with an example batch" do |extra_batch_modules = nil|
   subject(:example_batch) { example_batch_class.new(id, **input) }
 
-  let(:root_batch_modules) do
-    [ BatchProcessor::Batch::Callbacks, BatchProcessor::Batch::Core ]
-  end
+  let(:root_batch_modules) { [ BatchProcessor::Batch::Callbacks, BatchProcessor::Batch::Core ] }
   let(:batch_modules) { root_batch_modules + Array.wrap(extra_batch_modules) }
 
   let(:root_batch_class) { Class.new(Instructor::Base) }
