@@ -13,6 +13,7 @@ module BatchProcessor
     field :aborted_at, :datetime
     field :ended_at, :datetime
 
+    field :size, :integer
     field :enqueued_jobs_count, :integer
     field :pending_jobs_count, :integer
     field :running_jobs_count, :integer
