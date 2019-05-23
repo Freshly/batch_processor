@@ -20,4 +20,6 @@ module BatchProcessor
 
   class BatchEmptyError < ProcessorError; end
   class BatchAlreadyStartedError < ProcessorError; end
+  class BatchAlreadyFinishedError < ProcessorError; end
+  class BatchStillProcessingError < ProcessorError; end
 end
