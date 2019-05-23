@@ -13,6 +13,9 @@ require "batch_processor/processor_base"
 
 module BatchProcessor
   class Error < StandardError; end
+  class BatchError < Error; end
+  class ProcessorError < Error; end
 
-  class ExistingBatchError < Error; end
+  class ExistingBatchError < BatchError; end
+  class BatchEmptyError < ProcessorError; end
 end

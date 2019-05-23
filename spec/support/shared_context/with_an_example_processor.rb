@@ -3,7 +3,9 @@
 RSpec.shared_context "with an example processor" do |extra_processor_modules = nil|
   subject(:example_processor) { example_processor_class.new(batch) }
 
-  let(:root_processor_modules) { [ BatchProcessor::Processor::Callbacks, BatchProcessor::Processor::Core ] }
+  let(:root_processor_modules) do
+    [ Technologic, BatchProcessor::Processor::Callbacks, BatchProcessor::Processor::Core ]
+  end
   let(:batch_modules) { root_processor_modules + Array.wrap(extra_processor_modules) }
 
   let(:root_processor_class) { Class.new }
