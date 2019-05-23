@@ -5,6 +5,7 @@ require_relative "batch/core"
 require_relative "batch/collection"
 require_relative "batch/job"
 require_relative "batch/processor"
+require_relative "batch/predicates"
 
 module BatchProcessor
   class BatchBase < Instructor::Base
@@ -13,5 +14,6 @@ module BatchProcessor
     include BatchProcessor::Batch::Collection
     include BatchProcessor::Batch::Job
     include BatchProcessor::Batch::Processor
+    include BatchProcessor::Batch::Predicates
   end
 end

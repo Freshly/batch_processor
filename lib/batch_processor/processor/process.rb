@@ -7,8 +7,7 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       def process
-        # TODO: batch.started?
-        raise BatchProcessor::BatchAlreadyStartedError if batch.details.started_at?
+        raise BatchProcessor::BatchAlreadyStartedError if batch.started?
 
         # TODO: batch.start
 
