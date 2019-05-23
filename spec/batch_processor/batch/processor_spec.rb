@@ -37,4 +37,20 @@ RSpec.describe BatchProcessor::Batch::Processor, type: :module do
       it { is_expected.to eq described_class::PROCESSOR_CLASS_BY_STRATEGY[:default] }
     end
   end
+
+  describe "#process" do
+    subject(:process) { example_batch.process }
+
+    let(:processor_class) { double }
+
+    before do
+      allow(example_batch).to receive(:processor_class).and_return(processor_class)
+      allow(processor_class).to receive(:execute)
+    end
+
+    it "executes the processor" do
+      process
+      expect(processor_class).to have_received(:execute).with(example_batch)
+    end
+  end
 end
