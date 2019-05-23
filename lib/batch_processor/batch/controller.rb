@@ -7,11 +7,23 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       included do
+        delegate :allow_empty?, to: :class
         delegate :pipelined, to: :details
+      end
+
+      class_methods do
+        def allow_empty
+          @allow_empty = true
+        end
+
+        def allow_empty?
+          @allow_empty.present?
+        end
       end
 
       def start
         raise BatchProcessor::BatchAlreadyStartedError if started?
+        raise BatchProcessor::BatchEmptyError if collection.empty? && !allow_empty?
 
         pipelined do
           details.started_at = Time.current

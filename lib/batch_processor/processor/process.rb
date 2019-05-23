@@ -7,8 +7,6 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       def process
-        raise BatchProcessor::BatchAlreadyStartedError if batch.started?
-
         batch.start
       end
     end

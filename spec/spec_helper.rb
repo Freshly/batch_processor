@@ -17,8 +17,6 @@ require_relative "support/shared_context/with_an_example_batch"
 require_relative "support/shared_context/with_an_example_processor"
 require_relative "support/shared_context/with_example_details"
 
-require_relative "support/shared_examples/processing_starts"
-
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = ".rspec_status"

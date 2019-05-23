@@ -13,13 +13,13 @@ require "batch_processor/batch_base"
 
 module BatchProcessor
   class Error < StandardError; end
+
   class BatchError < Error; end
-  class ProcessorError < Error; end
-
   class ExistingBatchError < BatchError; end
+  class BatchEmptyError < BatchError; end
+  class BatchAlreadyStartedError < BatchError; end
+  class BatchAlreadyFinishedError < BatchError; end
+  class BatchStillProcessingError < BatchError; end
 
-  class BatchEmptyError < ProcessorError; end
-  class BatchAlreadyStartedError < ProcessorError; end
-  class BatchAlreadyFinishedError < ProcessorError; end
-  class BatchStillProcessingError < ProcessorError; end
+  class ProcessorError < Error; end
 end
