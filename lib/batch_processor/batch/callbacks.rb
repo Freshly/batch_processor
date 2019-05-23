@@ -8,8 +8,9 @@ module BatchProcessor
 
       included do
         include ActiveSupport::Callbacks
-        define_callbacks_with_handler :job_started, :job_retrying, :job_performed, :job_canceled,
-                                      :batch_aborted, :batch_finished, :batch_success, :batch_errored, :batch_completed
+        define_callbacks_with_handler :job_started, :job_retried, :job_performed, :job_canceled,
+                                      :batch_started, :batch_enqueued, :batch_aborted,
+                                      :batch_finished, :batch_success, :batch_errored, :batch_completed
       end
 
       class_methods do

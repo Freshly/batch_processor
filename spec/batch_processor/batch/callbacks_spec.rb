@@ -7,9 +7,11 @@ RSpec.describe BatchProcessor::Batch::Callbacks, type: :module do
 
   it_behaves_like "an example class with callbacks", described_class, %i[
     job_started
-    job_retrying
+    job_retried
     job_performed
     job_canceled
+    batch_started
+    batch_enqueued
     batch_aborted
     batch_finished
     batch_success
@@ -37,8 +39,8 @@ RSpec.describe BatchProcessor::Batch::Callbacks, type: :module do
     it_behaves_like "a handler for the callback", :job_started
   end
 
-  describe "#on_job_retrying" do
-    it_behaves_like "a handler for the callback", :job_retrying
+  describe "#on_job_retried" do
+    it_behaves_like "a handler for the callback", :job_retried
   end
 
   describe "#on_job_performed" do
@@ -47,6 +49,14 @@ RSpec.describe BatchProcessor::Batch::Callbacks, type: :module do
 
   describe "#on_job_canceled" do
     it_behaves_like "a handler for the callback", :job_canceled
+  end
+
+  describe "#on_batch_started" do
+    it_behaves_like "a handler for the callback", :batch_started
+  end
+
+  describe "#on_batch_enqueued" do
+    it_behaves_like "a handler for the callback", :batch_enqueued
   end
 
   describe "#on_batch_aborted" do

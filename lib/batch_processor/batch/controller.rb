@@ -25,9 +25,11 @@ module BatchProcessor
         raise BatchProcessor::BatchAlreadyStartedError if started?
         raise BatchProcessor::BatchEmptyError if collection.empty? && !allow_empty?
 
-        pipelined do
-          details.started_at = Time.current
-          details.size = collection.size
+        run_callbacks(:batch_started) do
+          pipelined do
+            details.started_at = Time.current
+            details.size = collection.size
+          end
         end
 
         started?
@@ -37,7 +39,7 @@ module BatchProcessor
         raise BatchProcessor::BatchAlreadyFinishedError if finished?
         raise BatchProcessor::BatchStillProcessingError if unfinished_jobs?
 
-        details.finished_at = Time.current
+        run_callbacks(:batch_finished) { details.finished_at = Time.current }
 
         finished?
       end

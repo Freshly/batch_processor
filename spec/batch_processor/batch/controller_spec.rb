@@ -50,10 +50,19 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
         it { is_expected.to eq true }
 
         it "starts processing the batch" do
-          expect { subject }.
+          expect { start }.
             to change { example_batch.started? }.from(false).to(true).
             and change { example_batch.details.started_at&.change(usec: 0) }.from(nil).to(Time.current.change(usec: 0)).
             and change { example_batch.details.size }.from(0).to(collection.size)
+        end
+
+        it_behaves_like "a class with callback" do
+          include_context "with callbacks", :batch_started
+
+          subject(:callback_runner) { start }
+
+          let(:example) { example_batch }
+          let(:example_class) { example.class }
         end
       end
 
@@ -99,9 +108,18 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
         it { is_expected.to eq true }
 
         it "finishes the batch" do
-          expect { subject }.
+          expect { finish }.
             to change { example_batch.finished? }.from(false).to(true).
             and change { example_batch.details.finished_at&.change(usec: 0) }.from(nil).to(Time.current.change(usec: 0))
+        end
+
+        it_behaves_like "a class with callback" do
+          include_context "with callbacks", :batch_finished
+
+          subject(:callback_runner) { finish }
+
+          let(:example) { example_batch }
+          let(:example_class) { example.class }
         end
       end
     end
