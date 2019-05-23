@@ -8,7 +8,7 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
   it { is_expected.to inherit_from RedisHash::Base }
   it { is_expected.to include_module Spicerack::HashModel }
 
-  it { is_expected.to define_field :began_at, :datetime }
+  it { is_expected.to define_field :started_at, :datetime }
   it { is_expected.to define_field :enqueued_at, :datetime }
   it { is_expected.to define_field :aborted_at, :datetime }
   it { is_expected.to define_field :ended_at, :datetime }
@@ -23,7 +23,7 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
   it { is_expected.to define_field :retried_jobs_count, :integer }
   it { is_expected.to define_field :cleared_jobs_count, :integer }
 
-  it { is_expected.to allow_key :began_at }
+  it { is_expected.to allow_key :started_at }
   it { is_expected.to allow_key :enqueued_at }
   it { is_expected.to allow_key :aborted_at }
   it { is_expected.to allow_key :ended_at }

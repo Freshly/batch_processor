@@ -15,6 +15,7 @@ RSpec.shared_context "with an example processor" do |extra_processor_modules = n
     end
   end
 
-  let(:batch) { batch_class.new }
+  let(:batch_id) { SecureRandom.hex}
+  let(:batch) { batch_class.new(batch_id) }
   let(:batch_class) { Class.new(BatchProcessor::BatchBase) }
 end
