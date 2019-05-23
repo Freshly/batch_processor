@@ -7,14 +7,14 @@ RSpec.describe BatchProcessor::Batch::Job, type: :module do
 
   it { is_expected.to delegate_method(:job_class).to(:class) }
 
-  describe ".process_with" do
-    subject(:process_with) { example_batch_class.__send__(:process_with, job_class) }
+  describe ".process_with_job" do
+    subject(:process_with_job) { example_batch_class.__send__(:process_with_job, job_class) }
 
     context "when unbatchable" do
       let(:job_class) { Class.new }
 
       it "raises" do
-        expect { process_with }.to raise_error ArgumentError, "Unbatchable job"
+        expect { process_with_job }.to raise_error ArgumentError, "Unbatchable job"
       end
     end
 
@@ -22,7 +22,7 @@ RSpec.describe BatchProcessor::Batch::Job, type: :module do
       let(:job_class) { batchable_job_class }
 
       it "sets @job_class" do
-        expect { process_with }.
+        expect { process_with_job }.
           to change { example_batch_class.instance_variable_get(:@job_class) }.
           from(nil).
           to(job_class)
@@ -36,12 +36,12 @@ RSpec.describe BatchProcessor::Batch::Job, type: :module do
     let(:example_job_class) { batchable_job_class }
 
     context "with @job_class" do
-      before { example_batch_class.__send__(:process_with, example_job_class) }
+      before { example_batch_class.__send__(:process_with_job, example_job_class) }
 
       it { is_expected.to eq example_job_class }
     end
 
-    context "without worker class" do
+    context "without @job_class" do
       let(:root_name) { Faker::Internet.domain_word.capitalize }
       let(:example_batch_class_name) { "#{root_name}Batch" }
       let(:example_job_class_name) { "#{root_name}Job" }
