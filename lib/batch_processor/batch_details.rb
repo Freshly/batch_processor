@@ -9,7 +9,7 @@ module BatchProcessor
 
     alias_method :data, :itself
 
-    field :began_at, :datetime
+    field :started_at, :datetime
     field :enqueued_at, :datetime
     field :aborted_at, :datetime
     field :ended_at, :datetime

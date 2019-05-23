@@ -31,6 +31,10 @@ module BatchProcessor
           PROCESSOR_CLASS_BY_STRATEGY[:default]
         end
       end
+
+      def process
+        processor_class.execute(self)
+      end
     end
   end
 end
