@@ -17,6 +17,17 @@ module BatchProcessor
           details.started_at = Time.current
           details.size = collection.size
         end
+
+        true
+      end
+
+      def finish
+        raise BatchProcessor::BatchAlreadyFinishedError if finished?
+        raise BatchProcessor::BatchStillProcessingError if unfinished_jobs?
+
+        details.finished_at = Time.current
+
+        true
       end
     end
   end
