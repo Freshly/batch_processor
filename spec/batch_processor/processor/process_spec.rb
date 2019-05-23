@@ -6,11 +6,27 @@ RSpec.describe BatchProcessor::Processor::Process, type: :module do
   describe "#process" do
     subject(:process) { example_processor.process }
 
-    before { allow(example_batch).to receive(:start) }
+    before do
+      allow(example_batch).to receive(:start)
+      allow(example_batch).to receive(:finish)
+    end
 
-    it "starts the batch" do
-      process
-      expect(example_batch).to have_received(:start)
+    context "with unfinished jobs" do
+      before { allow(example_batch).to receive(:unfinished_jobs?).and_return(true) }
+
+      it "starts but does not finish the batch" do
+        process
+        expect(example_batch).to have_received(:start)
+        expect(example_batch).not_to have_received(:finish)
+      end
+    end
+
+    context "without unfinished jobs" do
+      it "starts and finishes the batch" do
+        process
+        expect(example_batch).to have_received(:start)
+        expect(example_batch).to have_received(:finish)
+      end
     end
   end
 end

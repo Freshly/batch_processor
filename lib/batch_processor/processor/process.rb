@@ -8,6 +8,10 @@ module BatchProcessor
 
       def process
         batch.start
+
+        # TODO: Process the collections
+
+        batch.finish unless batch.unfinished_jobs?
       end
     end
   end
