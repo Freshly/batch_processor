@@ -13,7 +13,7 @@ module BatchProcessor
       class_methods do
         private
 
-        def process_with(job_class)
+        def process_with_job(job_class)
           raise ArgumentError, "Unbatchable job" unless job_class.ancestors.include? BatchProcessor::BatchableJob
 
           @job_class = job_class

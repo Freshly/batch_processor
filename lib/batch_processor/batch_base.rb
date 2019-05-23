@@ -4,6 +4,7 @@ require_relative "batch/callbacks"
 require_relative "batch/core"
 require_relative "batch/collection"
 require_relative "batch/job"
+require_relative "batch/processor"
 
 module BatchProcessor
   class BatchBase < Instructor::Base
@@ -11,5 +12,6 @@ module BatchProcessor
     include BatchProcessor::Batch::Core
     include BatchProcessor::Batch::Collection
     include BatchProcessor::Batch::Job
+    include BatchProcessor::Batch::Processor
   end
 end

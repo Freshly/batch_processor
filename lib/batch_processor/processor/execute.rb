@@ -10,17 +10,10 @@ module BatchProcessor
         set_callback :execute, :around, ->(_, block) { surveil(:execute) { block.call } }
       end
 
-      def execute!
+      def execute
         raise BatchProcessor::BatchEmptyError if batch.collection.empty?
 
         run_callbacks(:execute) { true }
-      end
-
-      def execute
-        execute!
-        true
-      rescue BatchProcessor::ProcessorError
-        false
       end
     end
   end

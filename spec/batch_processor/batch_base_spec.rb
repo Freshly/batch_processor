@@ -7,4 +7,5 @@ RSpec.describe BatchProcessor::BatchBase, type: :batch do
   it { is_expected.to include_module BatchProcessor::Batch::Core }
   it { is_expected.to include_module BatchProcessor::Batch::Collection }
   it { is_expected.to include_module BatchProcessor::Batch::Job }
+  it { is_expected.to include_module BatchProcessor::Batch::Processor }
 end
