@@ -3,6 +3,8 @@
 RSpec.describe BatchProcessor::Batch::Controller, type: :module do
   include_context "with an example batch", [ BatchProcessor::Batch::Predicates, described_class ]
 
+  it { is_expected.to delegate_method(:pipelined).to(:details) }
+
   describe "#start" do
     subject(:start) { example_batch.start }
 
@@ -15,9 +17,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
     end
 
     context "when not started" do
-      it "doesn't raise" do
-        expect { start }.not_to raise_error
-      end
+      it_behaves_like "processing starts"
     end
   end
 end

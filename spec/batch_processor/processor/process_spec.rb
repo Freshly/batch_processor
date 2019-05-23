@@ -15,9 +15,7 @@ RSpec.describe BatchProcessor::Processor::Process, type: :module do
     end
 
     context "when not started" do
-      it "doesn't raise" do
-        expect { process }.not_to raise_error
-      end
+      it_behaves_like "processing starts"
     end
   end
 end

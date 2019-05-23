@@ -14,15 +14,15 @@ module BatchProcessor
     field :aborted_at, :datetime
     field :ended_at, :datetime
 
-    field :size, :integer
-    field :enqueued_jobs_count, :integer
-    field :pending_jobs_count, :integer
-    field :running_jobs_count, :integer
-    field :successful_jobs_count, :integer
-    field :failed_jobs_count, :integer
-    field :canceled_jobs_count, :integer
-    field :retried_jobs_count, :integer
-    field :cleared_jobs_count, :integer
+    field :size, :integer, default: 0
+    field :enqueued_jobs_count, :integer, default: 0
+    field :pending_jobs_count, :integer, default: 0
+    field :running_jobs_count, :integer, default: 0
+    field :successful_jobs_count, :integer, default: 0
+    field :failed_jobs_count, :integer, default: 0
+    field :canceled_jobs_count, :integer, default: 0
+    field :retried_jobs_count, :integer, default: 0
+    field :cleared_jobs_count, :integer, default: 0
 
     allow_keys _fields
 
