@@ -22,7 +22,7 @@ RSpec.describe BatchProcessor::Processor::Execute, type: :module do
     context "with a batch collection" do
       before do
         allow(example_processor).to receive(:surveil).and_call_original
-        allow(batch).to receive(:collection).and_return(Faker::Lorem.words)
+        allow(example_batch).to receive(:collection).and_return(Faker::Lorem.words)
       end
 
       it_behaves_like "a class with callback" do

@@ -6,10 +6,17 @@ module BatchProcessor
     module Controller
       extend ActiveSupport::Concern
 
+      included do
+        delegate :pipelined, to: :details
+      end
+
       def start
         raise BatchProcessor::BatchAlreadyStartedError if started?
 
-        # TODO: Start the batch
+        pipelined do
+          details.started_at = Time.current
+          details.size = collection.size
+        end
       end
     end
   end

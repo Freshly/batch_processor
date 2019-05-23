@@ -9,9 +9,7 @@ module BatchProcessor
       def process
         raise BatchProcessor::BatchAlreadyStartedError if batch.started?
 
-        # TODO: batch.start
-
-        # TODO: Actually process the batch
+        batch.start
       end
     end
   end

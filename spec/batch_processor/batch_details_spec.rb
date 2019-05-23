@@ -13,15 +13,15 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
   it { is_expected.to define_field :aborted_at, :datetime }
   it { is_expected.to define_field :ended_at, :datetime }
 
-  it { is_expected.to define_field :size, :integer }
-  it { is_expected.to define_field :enqueued_jobs_count, :integer }
-  it { is_expected.to define_field :pending_jobs_count, :integer }
-  it { is_expected.to define_field :running_jobs_count, :integer }
-  it { is_expected.to define_field :successful_jobs_count, :integer }
-  it { is_expected.to define_field :failed_jobs_count, :integer }
-  it { is_expected.to define_field :canceled_jobs_count, :integer }
-  it { is_expected.to define_field :retried_jobs_count, :integer }
-  it { is_expected.to define_field :cleared_jobs_count, :integer }
+  it { is_expected.to define_field :size, :integer, default: 0 }
+  it { is_expected.to define_field :enqueued_jobs_count, :integer, default: 0 }
+  it { is_expected.to define_field :pending_jobs_count, :integer, default: 0 }
+  it { is_expected.to define_field :running_jobs_count, :integer, default: 0 }
+  it { is_expected.to define_field :successful_jobs_count, :integer, default: 0 }
+  it { is_expected.to define_field :failed_jobs_count, :integer, default: 0 }
+  it { is_expected.to define_field :canceled_jobs_count, :integer, default: 0 }
+  it { is_expected.to define_field :retried_jobs_count, :integer, default: 0 }
+  it { is_expected.to define_field :cleared_jobs_count, :integer, default: 0 }
 
   it { is_expected.to allow_key :started_at }
   it { is_expected.to allow_key :enqueued_at }
