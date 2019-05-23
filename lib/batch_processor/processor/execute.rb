@@ -17,8 +17,6 @@ module BatchProcessor
       end
 
       def execute
-        raise BatchProcessor::BatchEmptyError if batch.collection.empty?
-
         run_callbacks(:execute) { process }
       end
     end

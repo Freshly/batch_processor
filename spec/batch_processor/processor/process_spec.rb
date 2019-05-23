@@ -6,16 +6,11 @@ RSpec.describe BatchProcessor::Processor::Process, type: :module do
   describe "#process" do
     subject(:process) { example_processor.process }
 
-    context "when already started" do
-      before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "started_at", Time.now) }
+    before { allow(example_batch).to receive(:start) }
 
-      it "raises" do
-        expect { process }.to raise_error BatchProcessor::BatchAlreadyStartedError
-      end
-    end
-
-    context "when not started" do
-      it_behaves_like "processing starts"
+    it "starts the batch" do
+      process
+      expect(example_batch).to have_received(:start)
     end
   end
 end

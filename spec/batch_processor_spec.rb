@@ -22,19 +22,19 @@ RSpec.describe BatchProcessor do
   end
 
   describe described_class::BatchEmptyError do
-    it { is_expected.to inherit_from BatchProcessor::ProcessorError }
+    it { is_expected.to inherit_from BatchProcessor::BatchError }
   end
 
   describe described_class::BatchAlreadyStartedError do
-    it { is_expected.to inherit_from BatchProcessor::ProcessorError }
+    it { is_expected.to inherit_from BatchProcessor::BatchError }
   end
 
   describe described_class::BatchAlreadyFinishedError do
-    it { is_expected.to inherit_from BatchProcessor::ProcessorError }
+    it { is_expected.to inherit_from BatchProcessor::BatchError }
   end
 
   describe described_class::BatchStillProcessingError do
-    it { is_expected.to inherit_from BatchProcessor::ProcessorError }
+    it { is_expected.to inherit_from BatchProcessor::BatchError }
   end
 end
 
