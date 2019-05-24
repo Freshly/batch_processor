@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.shared_context "with an example processor" do |extra_processor_modules = nil|
-  subject(:example_processor) { example_processor_class.new(example_batch, **processor_options) }
+  subject(:example_processor) { example_processor_class.new(example_batch, processor_options) }
 
   let(:root_processor_modules) do
     [ Technologic, BatchProcessor::Processor::Callbacks, BatchProcessor::Processor::Core ]
