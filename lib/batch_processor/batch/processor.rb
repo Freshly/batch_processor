@@ -7,13 +7,14 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       PROCESSOR_CLASS_BY_STRATEGY = {
-        default: BatchProcessor::ProcessorBase,
-        parallel: BatchProcessor::ProcessorBase,
-        sequential: BatchProcessor::ProcessorBase,
+        default: BatchProcessor::Processors::Parallel,
+        parallel: BatchProcessor::Processors::Parallel,
+        sequential: BatchProcessor::Processors::Sequential,
       }.freeze
 
       included do
-        delegate :processor_class, to: :class
+        class_attribute :_processor_options, instance_writer: false, default: {}
+        delegate :processor_class, :processor_options, to: :class
       end
 
       class_methods do
@@ -23,6 +24,12 @@ module BatchProcessor
           private strategy_method
         end
 
+        def inherited(base)
+          dup = _processor_options.dup
+          base._processor_options = dup.each { |k, v| dup[k] = v.dup }
+          super
+        end
+
         private
 
         def processor_class
@@ -30,10 +37,14 @@ module BatchProcessor
 
           PROCESSOR_CLASS_BY_STRATEGY[:default]
         end
+
+        def processor_option(option, value = nil)
+          _processor_options[option.to_sym] = value
+        end
       end
 
       def process
-        processor_class.execute(self)
+        processor_class.execute(self, **_processor_options)
       end
     end
   end
