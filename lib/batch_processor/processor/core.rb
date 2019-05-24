@@ -11,8 +11,10 @@ module BatchProcessor
       end
 
       def initialize(batch, **options)
-        @batch = batch
-        @options = options
+        run_callbacks(:initialize) do
+          @batch = batch
+          @options = options
+        end
       end
     end
   end

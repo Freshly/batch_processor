@@ -8,7 +8,7 @@ module BatchProcessor
 
       included do
         include ActiveSupport::Callbacks
-        define_callbacks :execute, :start, :job_perform, :finish
+        define_callbacks :initialize, :execute
       end
     end
   end
