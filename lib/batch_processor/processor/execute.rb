@@ -11,8 +11,8 @@ module BatchProcessor
       end
 
       class_methods do
-        def execute(batch)
-          new(batch).execute
+        def execute(*arguments)
+          new(*arguments).execute
         end
       end
 

@@ -7,11 +7,12 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       included do
-        attr_reader :batch
+        attr_reader :batch, :options
       end
 
-      def initialize(batch)
+      def initialize(batch, **options)
         @batch = batch
+        @options = options
       end
     end
   end

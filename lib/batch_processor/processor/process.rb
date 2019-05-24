@@ -9,9 +9,13 @@ module BatchProcessor
       def process
         batch.start
 
-        # TODO: Process the collections
+        process_collection
 
         batch.finish unless batch.unfinished_jobs?
+      end
+
+      def process_collection
+        # abstract
       end
     end
   end
