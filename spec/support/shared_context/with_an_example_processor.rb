@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.shared_context "with an example processor" do |extra_processor_modules = nil|
-  subject(:example_processor) { example_processor_class.new(example_batch) }
+  subject(:example_processor) { example_processor_class.new(example_batch, **processor_options) }
 
   let(:root_processor_modules) do
     [ Technologic, BatchProcessor::Processor::Callbacks, BatchProcessor::Processor::Core ]
@@ -16,6 +16,7 @@ RSpec.shared_context "with an example processor" do |extra_processor_modules = n
   end
 
   let(:batch_id) { SecureRandom.hex}
+  let(:processor_options) { {} }
   let(:example_batch) { example_batch_class.new(batch_id) }
   let(:example_batch_class) { Class.new(BatchProcessor::BatchBase) }
 end
