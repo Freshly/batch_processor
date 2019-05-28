@@ -7,8 +7,7 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       included do
-        class_attribute :_options, instance_writer: false, default: {}
-        delegate :_options, to: :class
+        class_attribute :_options, instance_writer: false, default: []
 
         set_callback(:initialize, :after) do
           unknown = @options.keys - _options.keys
@@ -18,15 +17,15 @@ module BatchProcessor
 
       class_methods do
         def inherited(base)
-          dup = _options.dup
-          base._options = dup.each { |k, v| dup[k] = v.dup }
+          base._options = _options.dup
           super
         end
 
         private
 
-        def define_option(name, default_value: nil)
-          _options[name.to_sym] = default_value
+        def option(option, default: nil, &block)
+          _options << option
+          define_default option, static: default, &block
         end
       end
     end

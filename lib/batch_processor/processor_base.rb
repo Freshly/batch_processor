@@ -9,6 +9,7 @@ require_relative "processor/execute"
 module BatchProcessor
   class ProcessorBase
     include Technologic
+    include Tablesalt::Dsl::Defaults
     include BatchProcessor::Processor::Callbacks
     include BatchProcessor::Processor::Core
     include BatchProcessor::Processor::Options
