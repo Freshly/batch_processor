@@ -11,7 +11,8 @@ module BatchProcessor
         delegate :_options, to: :class
 
         set_callback(:initialize, :after) do
-          # TODO: Validate the optiosn are in the whitelist
+          unknown = @options.keys - _options.keys
+          raise ArgumentError, "unknown processor #{"option".pluralize(unknown.size)}: #{unknown.join(", ")}"
         end
       end
 
