@@ -29,7 +29,7 @@ RSpec.describe BatchProcessor::Batch::Core, type: :module do
       end
 
       it "stores input" do
-        expect(example_batch.input).to eq expected_input
+        expect(example_batch.__send__(:input)).to eq expected_input
       end
     end
 
