@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe BatchProcessor::BatchBase, type: :batch do
-  it { is_expected.to inherit_from Instructor::Base }
+  it { is_expected.to inherit_from Spicerack::InputModel }
 
   it { is_expected.to include_module BatchProcessor::Batch::Callbacks }
   it { is_expected.to include_module BatchProcessor::Batch::Core }
