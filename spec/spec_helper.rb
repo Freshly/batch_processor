@@ -5,7 +5,6 @@ require "pry"
 require "simplecov"
 
 require "spicerack/spec_helper"
-require "technologic/spec_helper"
 require "shoulda-matchers"
 
 SimpleCov.start do

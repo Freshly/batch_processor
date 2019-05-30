@@ -79,6 +79,7 @@ RSpec.describe BatchProcessor::Processor::Process, type: :module do
 
       it_behaves_like "a surveiled event", :item_processed do
         let(:expected_class) { example_processor_class.name }
+        let(:frequency) { expected_collection.size }
 
         before { process_collection }
       end
