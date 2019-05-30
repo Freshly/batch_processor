@@ -7,6 +7,6 @@ RSpec.shared_context "with an example processor" do
 
   let(:batch_id) { SecureRandom.hex }
   let(:processor_options) { {} }
-  let(:example_batch) { example_batch_class.new(batch_id) }
+  let(:example_batch) { example_batch_class.new(batch_id: batch_id) }
   let(:example_batch_class) { Class.new(BatchProcessor::BatchBase) }
 end

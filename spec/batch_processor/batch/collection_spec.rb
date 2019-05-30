@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe BatchProcessor::Batch::Collection, type: :module do
-  include_context "with an example batch", described_class
+  include_context "with an example batch"
 
   describe "#collection" do
     subject { example_batch.collection }

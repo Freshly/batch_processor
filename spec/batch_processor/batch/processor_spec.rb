@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe BatchProcessor::Batch::Processor, type: :module do
-  include_context "with an example batch", described_class
+  include_context "with an example batch"
 
   it { is_expected.to delegate_method(:processor_class).to(:class) }
   it { is_expected.to delegate_method(:processor_options).to(:class) }

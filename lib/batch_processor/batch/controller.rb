@@ -7,6 +7,8 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       included do
+        define_callbacks_with_handler :batch_started, :batch_finished
+
         delegate :allow_empty?, to: :class
         delegate :pipelined, to: :details
       end
