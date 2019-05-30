@@ -28,7 +28,7 @@ module BatchProcessor
         run_callbacks(:batch_started) do
           pipelined do
             details.started_at = Time.current
-            details.size = collection.size
+            details.size = collection.count
           end
         end
 

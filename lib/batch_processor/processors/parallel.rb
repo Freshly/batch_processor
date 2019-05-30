@@ -3,7 +3,7 @@
 module BatchProcessor
   module Processors
     class Parallel < BatchProcessor::ProcessorBase
-      def process_collection
+      def process_collection_item(item)
         # TODO: Implement
       end
     end

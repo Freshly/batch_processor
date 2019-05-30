@@ -6,6 +6,11 @@ module BatchProcessor
     module Process
       extend ActiveSupport::Concern
 
+      included do
+        define_callbacks :process_item
+        set_callback :process_item, :around, ->(_, block) { surveil(:process_item) { block.call } }
+      end
+
       def process
         batch.start
 
@@ -14,8 +19,16 @@ module BatchProcessor
         batch.finish unless batch.unfinished_jobs?
       end
 
+      def process_collection_item(_item)
+        # Abstract
+      end
+
+      private
+
       def process_collection
-        # abstract
+        batch.collection.public_send(batch.collection.respond_to?(:find_each) ? :find_each : :each) do |item|
+          run_callbacks(:process_item) { process_collection_item(item) }
+        end
       end
     end
   end
