@@ -12,6 +12,21 @@ RSpec.describe BatchProcessor::Processor::Process, type: :module do
       allow(example_batch).to receive(:finish)
     end
 
+    it_behaves_like "a class with callback" do
+      include_context "with callbacks", :collection_processed
+
+      subject(:callback_runner) { process }
+
+      let(:example) { example_processor }
+      let(:example_class) { example.class }
+    end
+
+    it_behaves_like "a surveiled event", :collection_processed do
+      let(:expected_class) { example_processor_class.name }
+
+      before { process }
+    end
+
     context "with unfinished jobs" do
       before { allow(example_batch).to receive(:unfinished_jobs?).and_return(true) }
 
@@ -51,6 +66,21 @@ RSpec.describe BatchProcessor::Processor::Process, type: :module do
         expected_collection.each do |item|
           expect(example_processor).to have_received(:process_collection_item).with(item).ordered
         end
+      end
+
+      it_behaves_like "a class with callback" do
+        include_context "with callbacks", :item_processed
+
+        subject(:callback_runner) { process_collection }
+
+        let(:example) { example_processor }
+        let(:example_class) { example.class }
+      end
+
+      it_behaves_like "a surveiled event", :item_processed do
+        let(:expected_class) { example_processor_class.name }
+
+        before { process_collection }
       end
     end
 
