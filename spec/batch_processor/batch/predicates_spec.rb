@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe BatchProcessor::Batch::Predicates, type: :module do
-  include_context "with an example batch", described_class
+  include_context "with an example batch"
 
   shared_examples_for "a date predicate" do |detail, source|
     subject { example_batch.public_send(detail) }

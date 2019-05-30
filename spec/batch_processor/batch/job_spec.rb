@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe BatchProcessor::Batch::Job, type: :module do
-  include_context "with an example batch", described_class
+  include_context "with an example batch"
 
   let(:batchable_job_class) { Class.new(BatchProcessor::BatchableJob) }
 

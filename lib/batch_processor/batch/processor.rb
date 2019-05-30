@@ -6,11 +6,14 @@ module BatchProcessor
     module Processor
       extend ActiveSupport::Concern
 
+      # This is left mutable for extension and customization
+      # rubocop:disable Style/MutableConstant
       PROCESSOR_CLASS_BY_STRATEGY = {
         default: BatchProcessor::Processors::Parallel,
         parallel: BatchProcessor::Processors::Parallel,
         sequential: BatchProcessor::Processors::Sequential,
-      }.freeze
+      }
+      # rubocop:enable Style/MutableConstant
 
       included do
         class_attribute :_processor_options, instance_writer: false, default: {}
