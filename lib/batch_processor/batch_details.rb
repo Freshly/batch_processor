@@ -11,6 +11,7 @@ module BatchProcessor
     field :finished_at, :datetime
 
     field :size, :integer, default: 0
+
     field :enqueued_jobs_count, :integer, default: 0
 
     field :pending_jobs_count, :integer, default: 0

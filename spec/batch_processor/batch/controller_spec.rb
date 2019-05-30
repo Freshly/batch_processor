@@ -32,7 +32,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
     end
   end
 
-  describe "#start" do
+  describe "#start", type: :with_frozen_time do
     subject(:start) { example_batch.start }
 
     context "when already started" do
@@ -52,8 +52,9 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
         it "starts processing the batch" do
           expect { start }.
             to change { example_batch.started? }.from(false).to(true).
-            and change { example_batch.details.started_at&.change(usec: 0) }.from(nil).to(Time.current.change(usec: 0)).
-            and change { example_batch.details.size }.from(0).to(collection.size)
+            and change { example_batch.details.started_at }.from(nil).to(Time.current).
+            and change { example_batch.details.size }.from(0).to(collection.size).
+            and change { example_batch.details.pending_jobs_count }.from(0).to(collection.size)
         end
 
         it_behaves_like "a class with callback" do
@@ -84,7 +85,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
     end
   end
 
-  describe "#finish" do
+  describe "#finish", type: :with_frozen_time do
     subject(:finish) { example_batch.finish }
 
     context "when already finish" do
@@ -110,7 +111,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
         it "finishes the batch" do
           expect { finish }.
             to change { example_batch.finished? }.from(false).to(true).
-            and change { example_batch.details.finished_at&.change(usec: 0) }.from(nil).to(Time.current.change(usec: 0))
+            and change { example_batch.details.finished_at }.from(nil).to(Time.current)
         end
 
         it_behaves_like "a class with callback" do

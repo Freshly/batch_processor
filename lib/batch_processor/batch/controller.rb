@@ -26,9 +26,12 @@ module BatchProcessor
         raise BatchProcessor::BatchEmptyError if collection.empty? && !allow_empty?
 
         run_callbacks(:batch_started) do
+          collection_size = collection.count
+
           pipelined do
             details.started_at = Time.current
-            details.size = collection.count
+            details.size = collection_size
+            details.pending_jobs_count = collection_size
           end
         end
 

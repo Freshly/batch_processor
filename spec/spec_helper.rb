@@ -4,6 +4,8 @@ require "bundler/setup"
 require "pry"
 require "simplecov"
 
+require "timecop"
+
 require "spicerack/spec_helper"
 require "shoulda-matchers"
 
@@ -29,6 +31,9 @@ RSpec.configure do |config|
   end
 
   config.before(:each) { Redis.new.flushdb }
+
+  config.before(:each, type: :with_frozen_time) { Timecop.freeze(Time.now.round) }
+  config.after(:each) { Timecop.return }
 end
 
 Shoulda::Matchers.configure do |config|
