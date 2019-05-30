@@ -9,7 +9,7 @@ require_relative "batch/predicates"
 require_relative "batch/controller"
 
 module BatchProcessor
-  class BatchBase < Instructor::Base
+  class BatchBase < Spicerack::InputModel
     include BatchProcessor::Batch::Callbacks
     include BatchProcessor::Batch::Core
     include BatchProcessor::Batch::Collection
