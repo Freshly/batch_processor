@@ -7,6 +7,7 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       included do
+        define_callbacks :execute
         set_callback :execute, :around, ->(_, block) { surveil(:execute) { block.call } }
       end
 

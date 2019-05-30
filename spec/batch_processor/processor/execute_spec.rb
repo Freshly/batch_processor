@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe BatchProcessor::Processor::Execute, type: :module do
-  include_context "with an example processor", [ BatchProcessor::Processor::Process, described_class ]
+  include_context "with an example processor"
 
   describe ".execute" do
     it_behaves_like "a class pass method", :execute do
