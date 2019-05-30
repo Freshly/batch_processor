@@ -13,10 +13,7 @@ RSpec.describe BatchProcessor::Processor::Execute, type: :module do
   describe "#execute" do
     subject(:execute) { example_processor.execute }
 
-    before do
-      allow(example_processor).to receive(:surveil).and_call_original
-      allow(example_processor).to receive(:process)
-    end
+    before { allow(example_processor).to receive(:process) }
 
     it_behaves_like "a class with callback" do
       include_context "with callbacks", :execute
@@ -27,10 +24,10 @@ RSpec.describe BatchProcessor::Processor::Execute, type: :module do
       let(:example_class) { example.class }
     end
 
-    it "is surveiled" do
-      execute
-      expect(example_processor).to have_received(:surveil).with(:execute)
-      expect(example_processor).to have_received(:process)
+    it_behaves_like "a surveiled event", :execute do
+      let(:expected_class) { example_processor_class.name }
+
+      before { execute }
     end
   end
 end
