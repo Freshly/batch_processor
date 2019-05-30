@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe BatchProcessor::Processor::Process, type: :module do
-  include_context "with an example processor", described_class
+  include_context "with an example processor"
 
   describe "#process" do
     subject(:process) { example_processor.process }
