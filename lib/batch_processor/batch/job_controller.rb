@@ -7,7 +7,7 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       included do
-        define_callbacks_with_handler :job_enqueued, :job_retried
+        define_callbacks_with_handler :job_enqueued, :job_retried, :job_canceled
       end
 
       def job_enqueued
@@ -25,6 +25,17 @@ module BatchProcessor
             details.increment(:total_retries_count)
             details.increment(:pending_jobs_count)
             details.decrement(:running_jobs_count)
+          end
+        end
+      end
+
+      def job_canceled
+        raise BatchProcessor::BatchNotProcessingError unless processing?
+
+        run_callbacks(__method__) do
+          details.pipelined do
+            details.increment(:canceled_jobs_count)
+            details.decrement(:pending_jobs_count)
           end
         end
       end
