@@ -50,7 +50,7 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
     end
   end
 
-  describe "#job_retrying" do
+  describe "#job_retried" do
     subject(:job_retried) { example_batch.job_retried }
 
     it_behaves_like "the batch must be processing"
@@ -73,6 +73,35 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
         include_context "with callbacks", :job_retried
 
         subject(:callback_runner) { job_retried }
+
+        let(:example) { example_batch }
+        let(:example_class) { example.class }
+      end
+    end
+  end
+
+  describe "#job_canceled" do
+    subject(:job_canceled) { example_batch.job_canceled }
+
+    it_behaves_like "the batch must be processing"
+
+    context "when started" do
+      before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(id), "started_at", Time.now) }
+
+      let(:collection) { Faker::Lorem.words }
+
+      it { is_expected.to eq [ 1, -1 ] }
+
+      it "tracks job" do
+        expect { job_canceled }.
+          to change  { example_batch.details.canceled_jobs_count }.by(1).
+          and change { example_batch.details.pending_jobs_count }.by(-1)
+      end
+
+      it_behaves_like "a class with callback" do
+        include_context "with callbacks", :job_canceled
+
+        subject(:callback_runner) { job_canceled }
 
         let(:example) { example_batch }
         let(:example_class) { example.class }
