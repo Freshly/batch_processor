@@ -88,7 +88,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
   describe "#finish", type: :with_frozen_time do
     subject(:finish) { example_batch.finish }
 
-    context "when already finish" do
+    context "when already finished" do
       before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(id), "finished_at", Time.now) }
 
       it "raises" do

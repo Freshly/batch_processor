@@ -57,11 +57,63 @@ RSpec.describe BatchProcessor::Batch::Predicates, type: :module do
     it_behaves_like "a job count predicate", :enqueued_jobs?, :enqueued_jobs_count
   end
 
+  describe "#pending_jobs?" do
+    it_behaves_like "a job count predicate", :pending_jobs?, :pending_jobs_count
+  end
+
+  describe "#running_jobs?" do
+    it_behaves_like "a job count predicate", :running_jobs?, :running_jobs_count
+  end
+
+  describe "#failed_jobs?" do
+    it_behaves_like "a job count predicate", :failed_jobs?, :failed_jobs_count
+  end
+
+  describe "#canceled_jobs?" do
+    it_behaves_like "a job count predicate", :canceled_jobs?, :canceled_jobs_count
+  end
+
+  describe "#retried_jobs?" do
+    it_behaves_like "a job count predicate", :retried_jobs?, :retried_jobs_count
+  end
+
   describe "#canceled_jobs?" do
     it_behaves_like "a job count predicate", :canceled_jobs?, :canceled_jobs_count
   end
 
   describe "#unfinished_jobs?" do
     it_behaves_like "a job count predicate", :unfinished_jobs?, :unfinished_jobs_count
+  end
+
+  describe "#finished_jobs?" do
+    it_behaves_like "a job count predicate", :finished_jobs?, :finished_jobs_count
+  end
+
+  describe "#processing?" do
+    context "when not started" do
+      it { is_expected.not_to be_processing }
+    end
+
+    context "when started" do
+      before { example_batch.details.started_at = Time.current }
+
+      context "when aborted" do
+        before { example_batch.details.aborted_at = Time.current }
+
+        it { is_expected.not_to be_processing }
+      end
+
+      context "when not aborted" do
+        context "when finished" do
+          before { example_batch.details.finished_at = Time.current }
+
+          it { is_expected.not_to be_processing }
+        end
+
+        context "when not finished" do
+          it { is_expected.to be_processing }
+        end
+      end
+    end
   end
 end

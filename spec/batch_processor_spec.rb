@@ -36,5 +36,8 @@ RSpec.describe BatchProcessor do
   describe described_class::BatchStillProcessingError do
     it { is_expected.to inherit_from BatchProcessor::BatchError }
   end
-end
 
+  describe described_class::BatchNotProcessingError do
+    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  end
+end
