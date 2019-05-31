@@ -9,7 +9,7 @@ module BatchProcessor
       included do
         date_predicate :started, :enqueued, :aborted, :finished
 
-        job_count_predicate :enqueued, :pending, :running, :failed, :canceled, :retried, :unfinished, :finished
+        job_count_predicate :enqueued, :pending, :running, :failed, :canceled, :unfinished, :finished
       end
 
       def processing?

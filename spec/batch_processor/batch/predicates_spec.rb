@@ -73,10 +73,6 @@ RSpec.describe BatchProcessor::Batch::Predicates, type: :module do
     it_behaves_like "a job count predicate", :canceled_jobs?, :canceled_jobs_count
   end
 
-  describe "#retried_jobs?" do
-    it_behaves_like "a job count predicate", :retried_jobs?, :retried_jobs_count
-  end
-
   describe "#canceled_jobs?" do
     it_behaves_like "a job count predicate", :canceled_jobs?, :canceled_jobs_count
   end

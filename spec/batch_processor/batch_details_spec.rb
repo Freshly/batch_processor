@@ -19,7 +19,6 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
   it { is_expected.to define_field :successful_jobs_count, :integer, default: 0 }
   it { is_expected.to define_field :failed_jobs_count, :integer, default: 0 }
   it { is_expected.to define_field :canceled_jobs_count, :integer, default: 0 }
-  it { is_expected.to define_field :retried_jobs_count, :integer, default: 0 }
   it { is_expected.to define_field :cleared_jobs_count, :integer, default: 0 }
   it { is_expected.to define_field :total_retries_count, :integer, default: 0 }
 
@@ -35,7 +34,6 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
   it { is_expected.to allow_key :successful_jobs_count }
   it { is_expected.to allow_key :failed_jobs_count }
   it { is_expected.to allow_key :canceled_jobs_count }
-  it { is_expected.to allow_key :retried_jobs_count }
   it { is_expected.to allow_key :cleared_jobs_count }
   it { is_expected.to allow_key :total_retries_count }
 
@@ -68,7 +66,7 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
     let(:failed_jobs_count) { 1_000 }
     let(:canceled_jobs_count) { 100 }
     let(:cleared_jobs_count) { 10 }
-    let(:retried_jobs_count) { 1 }
+    let(:total_retries_count) { 1 }
 
     before do
       batch_details.pipelined do
@@ -80,7 +78,7 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
         batch_details.failed_jobs_count = failed_jobs_count
         batch_details.canceled_jobs_count = canceled_jobs_count
         batch_details.cleared_jobs_count = cleared_jobs_count
-        batch_details.retried_jobs_count = retried_jobs_count
+        batch_details.total_retries_count = total_retries_count
       end
     end
   end
