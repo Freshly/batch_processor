@@ -11,7 +11,7 @@ module BatchProcessor
       end
 
       def job_enqueued
-        # TODO: raise if all jobs already enqueued
+        raise BatchProcessor::BatchAlreadyEnqueuedError if enqueued?
         raise BatchProcessor::BatchNotProcessingError unless processing?
 
         run_callbacks(:job_enqueued) { details.increment(:enqueued_jobs_count) }

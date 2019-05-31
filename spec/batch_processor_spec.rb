@@ -33,6 +33,10 @@ RSpec.describe BatchProcessor do
     it { is_expected.to inherit_from BatchProcessor::BatchError }
   end
 
+  describe described_class::BatchAlreadyEnqueuedError do
+    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  end
+
   describe described_class::BatchStillProcessingError do
     it { is_expected.to inherit_from BatchProcessor::BatchError }
   end

@@ -21,6 +21,7 @@ module BatchProcessor
   class BatchEmptyError < BatchError; end
   class BatchAlreadyStartedError < BatchError; end
   class BatchAlreadyFinishedError < BatchError; end
+  class BatchAlreadyEnqueuedError < BatchError; end
   class BatchStillProcessingError < BatchError; end
   class BatchNotProcessingError < BatchError; end
 
