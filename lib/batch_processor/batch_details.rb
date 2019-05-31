@@ -18,7 +18,6 @@ module BatchProcessor
     field :running_jobs_count, :integer, default: 0
 
     field :successful_jobs_count, :integer, default: 0
-    field :retried_jobs_count, :integer, default: 0
     field :failed_jobs_count, :integer, default: 0
 
     field :canceled_jobs_count, :integer, default: 0
