@@ -6,7 +6,7 @@ require "active_job"
 require "spicerack"
 
 require "batch_processor/version"
-require "batch_processor/batchable_job"
+require "batch_processor/batch_job"
 require "batch_processor/batch_details"
 require "batch_processor/processor_base"
 require "batch_processor/processors/parallel"
