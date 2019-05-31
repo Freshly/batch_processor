@@ -18,12 +18,13 @@ module BatchProcessor
     field :running_jobs_count, :integer, default: 0
 
     field :successful_jobs_count, :integer, default: 0
+    field :retried_jobs_count, :integer, default: 0
     field :failed_jobs_count, :integer, default: 0
 
     field :canceled_jobs_count, :integer, default: 0
     field :cleared_jobs_count, :integer, default: 0
 
-    field :retried_jobs_count, :integer, default: 0
+    field :total_retries_count, :integer, default: 0
 
     class << self
       def redis_key_for_batch_id(batch_id)
