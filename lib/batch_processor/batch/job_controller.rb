@@ -7,7 +7,15 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       included do
-        # define_callbacks_with_handler :batch_started, :batch_finished
+        define_callbacks_with_handler :job_enqueued
+      end
+
+      def job_enqueued
+        raise BatchProcessor::BatchNotProcessingError unless processing?
+
+        run_callbacks(:job_enqueued) { details.increment(:enqueued_jobs_count) }
+
+        true
       end
     end
   end

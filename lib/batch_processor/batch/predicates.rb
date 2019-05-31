@@ -7,25 +7,28 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       included do
-        date_predicate :started
-        date_predicate :enqueued
-        date_predicate :aborted
-        date_predicate :finished
+        date_predicate :started, :enqueued, :aborted, :finished
 
-        job_count_predicate :enqueued
-        job_count_predicate :canceled
-        job_count_predicate :unfinished
+        job_count_predicate :enqueued, :pending, :running, :failed, :canceled, :retried, :unfinished, :finished
+      end
+
+      def processing?
+        started? && !aborted? && !finished?
       end
 
       class_methods do
         private
 
-        def date_predicate(method)
-          define_method("#{method}?".to_sym) { details.public_send("#{method}_at?".to_sym) }
+        def date_predicate(*methods)
+          methods.each do |method|
+            define_method("#{method}?".to_sym) { details.public_send("#{method}_at?".to_sym) }
+          end
         end
 
-        def job_count_predicate(method)
-          define_method("#{method}_jobs?".to_sym) { details.public_send("#{method}_jobs_count".to_sym) > 0 }
+        def job_count_predicate(*methods)
+          methods.each do |method|
+            define_method("#{method}_jobs?".to_sym) { details.public_send("#{method}_jobs_count".to_sym) > 0 }
+          end
         end
       end
     end
