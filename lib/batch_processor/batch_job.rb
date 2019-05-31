@@ -5,26 +5,35 @@ module BatchProcessor
   class BatchJob < ActiveJob::Base
     attr_accessor :batch_id
 
-    around_perform do |_job, block|
-      block.call and next unless batch_job?
+    after_enqueue(if: :batch_job?) do |job|
+      case job.executions
+      when 0
+        # TODO: job_enqueued
+      when 1
+        # TODO: job_retried
+        # TODO: total_retries
+      else
+        # TODO: total_retries
+      end
+    end
 
-      # TODO: cancel if aborted...
+    before_perform(if: :batch_job?) do |job|
+      if job.batch.aborted?
+        # TODO: job_canceled
+      else
+        # TODO: job_running
+      end
+    end
 
-      # TODO: job started...
-      block.call
-      # TODO: job success...
+    after_perform(if: :batch_job?) do |_job|
+      # TODO: job_success
     end
 
     # Discard batch jobs which error as unexpectedly re-enqueued jobs can offset the counters
     discard_on StandardError do |_job, exception|
       raise exception unless batch_job?
 
-      # TODO: job failed...
-    end
-
-    def retry_job(options = {})
-      # TODO: job retried...
-      super
+      # TODO: job_failure
     end
 
     def serialize
