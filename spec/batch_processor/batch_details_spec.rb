@@ -21,6 +21,7 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
   it { is_expected.to define_field :canceled_jobs_count, :integer, default: 0 }
   it { is_expected.to define_field :retried_jobs_count, :integer, default: 0 }
   it { is_expected.to define_field :cleared_jobs_count, :integer, default: 0 }
+  it { is_expected.to define_field :total_retries_count, :integer, default: 0 }
 
   it { is_expected.to allow_key :started_at }
   it { is_expected.to allow_key :enqueued_at }
@@ -36,6 +37,7 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
   it { is_expected.to allow_key :canceled_jobs_count }
   it { is_expected.to allow_key :retried_jobs_count }
   it { is_expected.to allow_key :cleared_jobs_count }
+  it { is_expected.to allow_key :total_retries_count }
 
   describe "#batch_id" do
     subject { batch_details.batch_id }

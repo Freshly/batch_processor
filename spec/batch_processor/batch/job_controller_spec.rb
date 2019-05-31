@@ -36,7 +36,7 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
       it { is_expected.to eq 1 }
 
       it "track job" do
-        expect { job_enqueued }.to change { example_batch.details.enqueued_jobs_count }.from(0).to(1)
+        expect { job_enqueued }.to change { example_batch.details.enqueued_jobs_count }.by(1)
       end
 
       it_behaves_like "a class with callback" do
@@ -63,13 +63,43 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
       it { is_expected.to eq 1 }
 
       it "tracks job" do
-        expect { job_retried }.to change { example_batch.details.retried_jobs_count }.from(0).to(1)
+        expect { job_retried }.to change { example_batch.details.retried_jobs_count }.by(1)
       end
 
       it_behaves_like "a class with callback" do
         include_context "with callbacks", :job_retried
 
         subject(:callback_runner) { job_retried }
+
+        let(:example) { example_batch }
+        let(:example_class) { example.class }
+      end
+    end
+  end
+
+  describe "#job_retrying" do
+    subject(:job_retrying) { example_batch.job_retrying }
+
+    it_behaves_like "the batch must be processing"
+
+    context "when started" do
+      before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(id), "started_at", Time.now) }
+
+      let(:collection) { Faker::Lorem.words }
+
+      it { is_expected.to eq [ 1, 1, -1 ] }
+
+      it "tracks job" do
+        expect { job_retrying }.
+          to change  { example_batch.details.total_retries_count }.by(1).
+          and change { example_batch.details.pending_jobs_count }.by(1).
+          and change { example_batch.details.running_jobs_count }.by(-1)
+      end
+
+      it_behaves_like "a class with callback" do
+        include_context "with callbacks", :job_retrying
+
+        subject(:callback_runner) { job_retrying }
 
         let(:example) { example_batch }
         let(:example_class) { example.class }
