@@ -26,4 +26,5 @@ RSpec.describe BatchProcessor::BatchBase, type: :batch do
   it { is_expected.to include_module BatchProcessor::Batch::Processor }
   it { is_expected.to include_module BatchProcessor::Batch::Predicates }
   it { is_expected.to include_module BatchProcessor::Batch::Controller }
+  it { is_expected.to include_module BatchProcessor::Batch::JobController }
 end
