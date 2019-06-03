@@ -55,7 +55,8 @@ module BatchProcessor
       end
 
       def job_success
-        raise BatchProcessor::BatchNotProcessingError unless processing?
+        raise BatchProcessor::BatchNotStartedError unless started?
+        raise BatchProcessor::BatchAlreadyFinishedError if finished?
 
         run_callbacks(__method__) do
           details.pipelined do
@@ -66,7 +67,8 @@ module BatchProcessor
       end
 
       def job_failure
-        raise BatchProcessor::BatchNotProcessingError unless processing?
+        raise BatchProcessor::BatchNotStartedError unless started?
+        raise BatchProcessor::BatchAlreadyFinishedError if finished?
 
         run_callbacks(__method__) do
           details.pipelined do
@@ -77,7 +79,7 @@ module BatchProcessor
       end
 
       def job_canceled
-        raise BatchProcessor::BatchNotProcessingError unless processing?
+        raise BatchProcessor::BatchNotAbortedError unless aborted?
 
         run_callbacks(__method__) do
           details.pipelined do

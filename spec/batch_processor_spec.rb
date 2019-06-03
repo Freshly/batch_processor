@@ -44,4 +44,12 @@ RSpec.describe BatchProcessor do
   describe described_class::BatchNotProcessingError do
     it { is_expected.to inherit_from BatchProcessor::BatchError }
   end
+
+  describe described_class::BatchNotAbortedError do
+    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  end
+
+  describe described_class::BatchNotStartedError do
+    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  end
 end

@@ -17,6 +17,7 @@ require "batch_processor"
 
 require_relative "support/shared_context/with_an_example_batch"
 require_relative "support/shared_context/with_an_example_processor"
+require_relative "support/shared_examples/the_batch_must_be_processing"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -31,6 +32,7 @@ RSpec.configure do |config|
 
   config.before(:each) { Redis.new.flushdb }
 
+  config.before(:each, type: :job) { ActiveJob::Base.queue_adapter = :test }
   config.before(:each, type: :with_frozen_time) { Timecop.freeze(Time.now.round) }
   config.after(:each) { Timecop.return }
 end

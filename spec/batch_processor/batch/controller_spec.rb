@@ -36,7 +36,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
     subject(:start) { example_batch.start }
 
     context "when already started" do
-      before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(id), "started_at", Time.now) }
+      before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "started_at", Time.now) }
 
       it "raises" do
         expect { start }.to raise_error BatchProcessor::BatchAlreadyStartedError
@@ -95,7 +95,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
     subject(:finish) { example_batch.finish }
 
     context "when already finished" do
-      before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(id), "finished_at", Time.now) }
+      before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "finished_at", Time.now) }
 
       it "raises" do
         expect { finish }.to raise_error BatchProcessor::BatchAlreadyFinishedError
@@ -104,7 +104,9 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
 
     context "when not finished" do
       context "with pending jobs" do
-        before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(id), "pending_jobs_count", 1) }
+        before do
+          Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "pending_jobs_count", 1)
+        end
 
         it "raises" do
           expect { finish }.to raise_error BatchProcessor::BatchStillProcessingError
