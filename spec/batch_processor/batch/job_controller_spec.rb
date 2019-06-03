@@ -79,6 +79,64 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
     end
   end
 
+  describe "#job_success" do
+    subject(:job_success) { example_batch.job_success }
+
+    it_behaves_like "the batch must be processing"
+
+    context "when started" do
+      before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(id), "started_at", Time.now) }
+
+      let(:collection) { Faker::Lorem.words }
+
+      it { is_expected.to eq [ 1, -1 ] }
+
+      it "tracks job" do
+        expect { job_success }.
+          to change  { example_batch.details.successful_jobs_count }.by(1).
+          and change { example_batch.details.running_jobs_count }.by(-1)
+      end
+
+      it_behaves_like "a class with callback" do
+        include_context "with callbacks", :job_success
+
+        subject(:callback_runner) { job_success }
+
+        let(:example) { example_batch }
+        let(:example_class) { example.class }
+      end
+    end
+  end
+
+  describe "#job_failure" do
+    subject(:job_failure) { example_batch.job_failure }
+
+    it_behaves_like "the batch must be processing"
+
+    context "when started" do
+      before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(id), "started_at", Time.now) }
+
+      let(:collection) { Faker::Lorem.words }
+
+      it { is_expected.to eq [ 1, -1 ] }
+
+      it "tracks job" do
+        expect { job_failure }.
+          to change  { example_batch.details.failed_jobs_count }.by(1).
+          and change { example_batch.details.running_jobs_count }.by(-1)
+      end
+
+      it_behaves_like "a class with callback" do
+        include_context "with callbacks", :job_failure
+
+        subject(:callback_runner) { job_failure }
+
+        let(:example) { example_batch }
+        let(:example_class) { example.class }
+      end
+    end
+  end
+
   describe "#job_retried" do
     subject(:job_retried) { example_batch.job_retried }
 
