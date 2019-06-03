@@ -47,6 +47,12 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
         let(:example) { example_batch }
         let(:example_class) { example.class }
       end
+
+      it_behaves_like "a surveiled event", :job_enqueued do
+        let(:expected_class) { example_batch_class.name }
+
+        before { job_enqueued }
+      end
     end
   end
 
@@ -75,6 +81,12 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
 
         let(:example) { example_batch }
         let(:example_class) { example.class }
+      end
+
+      it_behaves_like "a surveiled event", :job_running do
+        let(:expected_class) { example_batch_class.name }
+
+        before { job_running }
       end
     end
   end
@@ -105,6 +117,12 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
         let(:example) { example_batch }
         let(:example_class) { example.class }
       end
+
+      it_behaves_like "a surveiled event", :job_success do
+        let(:expected_class) { example_batch_class.name }
+
+        before { job_success }
+      end
     end
   end
 
@@ -133,6 +151,12 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
 
         let(:example) { example_batch }
         let(:example_class) { example.class }
+      end
+
+      it_behaves_like "a surveiled event", :job_failure do
+        let(:expected_class) { example_batch_class.name }
+
+        before { job_failure }
       end
     end
   end
@@ -164,6 +188,12 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
         let(:example) { example_batch }
         let(:example_class) { example.class }
       end
+
+      it_behaves_like "a surveiled event", :job_retried do
+        let(:expected_class) { example_batch_class.name }
+
+        before { job_retried }
+      end
     end
   end
 
@@ -192,6 +222,12 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
 
         let(:example) { example_batch }
         let(:example_class) { example.class }
+      end
+
+      it_behaves_like "a surveiled event", :job_canceled do
+        let(:expected_class) { example_batch_class.name }
+
+        before { job_canceled }
       end
     end
   end

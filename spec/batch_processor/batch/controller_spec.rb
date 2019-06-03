@@ -65,6 +65,12 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
           let(:example) { example_batch }
           let(:example_class) { example.class }
         end
+
+        it_behaves_like "a surveiled event", :batch_started do
+          let(:expected_class) { example_batch_class.name }
+
+          before { start }
+        end
       end
 
       context "with an empty collection" do
@@ -121,6 +127,12 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
 
           let(:example) { example_batch }
           let(:example_class) { example.class }
+        end
+
+        it_behaves_like "a surveiled event", :batch_finished do
+          let(:expected_class) { example_batch_class.name }
+
+          before { finish }
         end
       end
     end
