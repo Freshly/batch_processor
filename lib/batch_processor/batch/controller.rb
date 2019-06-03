@@ -7,7 +7,7 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       included do
-        define_callbacks_with_handler :batch_started, :batch_finished
+        batch_callbacks :started, :finished
 
         delegate :allow_empty?, to: :class
         delegate :pipelined, to: :details
@@ -20,6 +20,18 @@ module BatchProcessor
 
         def allow_empty?
           @allow_empty.present?
+        end
+
+        private
+
+        def batch_callbacks(*events)
+          batch_events = events.map { |event| "batch_#{event}".to_sym }
+
+          define_callbacks_with_handler(*batch_events)
+
+          batch_events.each do |batch_event|
+            set_callback batch_event, :around, ->(_, block) { surveil(batch_event) { block.call } }
+          end
         end
       end
 

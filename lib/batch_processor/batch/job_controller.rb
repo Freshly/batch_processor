@@ -9,13 +9,19 @@ module BatchProcessor
       class_methods do
         private
 
-        def job_callbacks_with_handler(*events)
-          define_callbacks_with_handler(*events.map { |event| "job_#{event}".to_sym })
+        def job_callbacks(*events)
+          job_events = events.map { |event| "job_#{event}".to_sym }
+
+          define_callbacks_with_handler(*job_events)
+
+          job_events.each do |job_event|
+            set_callback job_event, :around, ->(_, block) { surveil(job_event) { block.call } }
+          end
         end
       end
 
       included do
-        job_callbacks_with_handler :enqueued, :running, :retried, :canceled, :success, :failure
+        job_callbacks :enqueued, :running, :retried, :canceled, :success, :failure
       end
 
       def job_enqueued
