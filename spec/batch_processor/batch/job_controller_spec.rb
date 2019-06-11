@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe BatchProcessor::Batch::JobController, type: :module do
-  include_context "with an example batch", [
-    BatchProcessor::Batch::Collection,
-    BatchProcessor::Batch::Predicates,
-    described_class,
-  ]
+  include_context "with an example batch"
 
   describe "#job_enqueued" do
     subject(:job_enqueued) { example_batch.job_enqueued }
@@ -248,5 +244,66 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
         before { job_canceled }
       end
     end
+  end
+
+  shared_examples_for "batch is finished when last" do |increment_field, decrement_field = :running_jobs_count|
+    before do
+      Redis.new.tap do |redis|
+        redis.pipelined do
+          redis_key = BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id)
+          redis.hset(redis_key, "started_at", Time.now)
+          redis.hset(redis_key, decrement_field, decrement_count)
+        end
+      end
+    end
+
+    context "when the last job" do
+      let(:decrement_count) { 1 }
+
+      it { is_expected.to eq [ 1, 0 ] }
+
+      it "completes the batch" do
+        expect { subject }.
+          to change  { example_batch.details.public_send(increment_field) }.by(1).
+          and change { example_batch.details.public_send(decrement_field) }.by(-1).
+          and change { example_batch.details.finished_at }.from(nil).to(Time.current).
+          and change { example_batch.finished? }.from(false).to(true)
+      end
+    end
+
+    context "when not the last job" do
+      let(:decrement_count) { 2 }
+
+      it { is_expected.to eq [ 1, 1 ] }
+
+      it "does not complete the batch" do
+        expect { subject }.
+          to change  { example_batch.details.public_send(increment_field) }.by(1).
+          and change { example_batch.details.public_send(decrement_field) }.by(-1)
+
+        expect(example_batch.details.finished_at).to be_nil
+        expect(example_batch).not_to be_finished
+      end
+    end
+  end
+
+  describe ".on_job_success callback", type: :with_frozen_time do
+    subject(:job_success) { example_batch.job_success }
+
+    it_behaves_like "batch is finished when last", :successful_jobs_count
+  end
+
+  describe ".on_job_failure callback", type: :with_frozen_time do
+    subject(:job_failure) { example_batch.job_failure }
+
+    it_behaves_like "batch is finished when last", :failed_jobs_count
+  end
+
+  describe ".on_job_canceled callback", type: :with_frozen_time do
+    subject(:job_failure) { example_batch.job_canceled }
+
+    before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "aborted_at", Time.now) }
+
+    it_behaves_like "batch is finished when last", :canceled_jobs_count, :pending_jobs_count
   end
 end

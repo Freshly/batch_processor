@@ -22,6 +22,10 @@ module BatchProcessor
 
       included do
         job_callbacks :enqueued, :running, :retried, :canceled, :success, :failure
+
+        on_job_success :finish, unless: :unfinished_jobs?
+        on_job_failure :finish, unless: :unfinished_jobs?
+        on_job_canceled :finish, unless: :unfinished_jobs?
       end
 
       def job_enqueued

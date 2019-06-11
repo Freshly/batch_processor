@@ -29,11 +29,15 @@ RSpec.describe BatchProcessor do
     it { is_expected.to inherit_from BatchProcessor::BatchError }
   end
 
-  describe described_class::BatchAlreadyFinishedError do
+  describe described_class::BatchAlreadyEnqueuedError do
     it { is_expected.to inherit_from BatchProcessor::BatchError }
   end
 
-  describe described_class::BatchAlreadyEnqueuedError do
+  describe described_class::BatchAlreadyAbortedError do
+    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  end
+
+  describe described_class::BatchAlreadyFinishedError do
     it { is_expected.to inherit_from BatchProcessor::BatchError }
   end
 

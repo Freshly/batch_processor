@@ -20,8 +20,9 @@ module BatchProcessor
   class ExistingBatchError < BatchError; end
   class BatchEmptyError < BatchError; end
   class BatchAlreadyStartedError < BatchError; end
-  class BatchAlreadyFinishedError < BatchError; end
   class BatchAlreadyEnqueuedError < BatchError; end
+  class BatchAlreadyFinishedError < BatchError; end
+  class BatchAlreadyAbortedError < BatchError; end
   class BatchStillProcessingError < BatchError; end
   class BatchNotProcessingError < BatchError; end
   class BatchNotAbortedError < BatchError; end

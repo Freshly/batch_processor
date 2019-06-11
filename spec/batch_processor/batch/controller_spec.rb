@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe BatchProcessor::Batch::Controller, type: :module do
-  include_context "with an example batch", [
-    BatchProcessor::Batch::Collection,
-    BatchProcessor::Batch::Predicates,
-    described_class,
-  ]
+  include_context "with an example batch"
 
   it { is_expected.to delegate_method(:pipelined).to(:details) }
   it { is_expected.to delegate_method(:allow_empty?).to(:class) }
@@ -111,28 +107,81 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
     context "when started" do
       before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "started_at", Time.now) }
 
-      shared_examples_for "the batch enqueued" do
+      it { is_expected.to eq true }
+
+      it "marks the batch as enqueued" do
+        expect { enqueued }.
+        to change { example_batch.enqueued? }.from(false).to(true).
+        and change { example_batch.details.enqueued_at }.from(nil).to(Time.current)
+      end
+
+      it_behaves_like "a class with callback" do
+        include_context "with callbacks", :batch_enqueued
+
+        subject(:callback_runner) { enqueued }
+
+        let(:example) { example_batch }
+        let(:example_class) { example.class }
+      end
+
+      it_behaves_like "a surveiled event", :batch_enqueued do
+        let(:expected_class) { example_batch_class.name }
+
+        before { enqueued }
+      end
+    end
+  end
+
+  describe "#abort!", type: :with_frozen_time do
+    subject(:abort!) { example_batch.abort! }
+
+    context "when not started" do
+      it "raises" do
+        expect { abort! }.to raise_error BatchProcessor::BatchNotStartedError
+      end
+    end
+
+    context "when started" do
+      before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "started_at", Time.now) }
+
+      context "when already aborted" do
+        before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "aborted_at", Time.now) }
+
+        it "raises" do
+          expect { abort! }.to raise_error BatchProcessor::BatchAlreadyAbortedError
+        end
+      end
+
+      context "when finished" do
+        before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "finished_at", Time.now) }
+
+        it "raises" do
+          expect { abort! }.to raise_error BatchProcessor::BatchAlreadyFinishedError
+        end
+      end
+
+      context "with unfinished and not aborted" do
         it { is_expected.to eq true }
 
-        it "marks the batch as enqueued" do
-          expect { enqueued }.
-            to change { example_batch.enqueued? }.from(false).to(true).
-            and change { example_batch.details.enqueued_at }.from(nil).to(Time.current)
+        it "marks the batch as aborted" do
+          expect { abort! }.
+            to change { example_batch.aborted? }.from(false).to(true).
+            and change { example_batch.details.aborted_at }.from(nil).to(Time.current)
         end
 
         it_behaves_like "a class with callback" do
-          include_context "with callbacks", :batch_enqueued
+          include_context "with callbacks", :batch_aborted
 
-          subject(:callback_runner) { enqueued }
+          subject(:callback_runner) { abort! }
 
           let(:example) { example_batch }
           let(:example_class) { example.class }
         end
 
-        it_behaves_like "a surveiled event", :batch_enqueued do
+        it_behaves_like "a surveiled event", :batch_aborted do
           let(:expected_class) { example_batch_class.name }
 
-          before { enqueued }
+          before { abort! }
         end
       end
     end

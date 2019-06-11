@@ -7,7 +7,7 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       included do
-        batch_callbacks :started, :enqueued, :finished
+        batch_callbacks :started, :enqueued, :aborted, :finished
 
         delegate :allow_empty?, to: :class
         delegate :pipelined, to: :details
@@ -59,6 +59,16 @@ module BatchProcessor
         run_callbacks(:batch_enqueued) { details.enqueued_at = Time.current }
 
         enqueued?
+      end
+
+      def abort!
+        raise BatchProcessor::BatchNotStartedError unless started?
+        raise BatchProcessor::BatchAlreadyFinishedError if finished?
+        raise BatchProcessor::BatchAlreadyAbortedError if aborted?
+
+        run_callbacks(:batch_aborted) { details.aborted_at = Time.current }
+
+        aborted?
       end
 
       def finish
