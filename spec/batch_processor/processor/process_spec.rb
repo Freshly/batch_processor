@@ -30,6 +30,8 @@ RSpec.describe BatchProcessor::Processor::Process, type: :module do
     context "with unfinished jobs" do
       before { allow(example_batch).to receive(:unfinished_jobs?).and_return(true) }
 
+      it { is_expected.to be_an_instance_of example_processor_class }
+
       it "starts but does not finish the batch" do
         process
         expect(example_batch).to have_received(:start)
