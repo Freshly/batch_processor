@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe BatchProcessor::Batch::Controller, type: :module do
-  include_context "with an example batch", [
-    BatchProcessor::Batch::Collection,
-    BatchProcessor::Batch::Predicates,
-    described_class,
-  ]
+  include_context "with an example batch"
 
   it { is_expected.to delegate_method(:pipelined).to(:details) }
   it { is_expected.to delegate_method(:allow_empty?).to(:class) }
@@ -111,29 +107,27 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
     context "when started" do
       before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "started_at", Time.now) }
 
-      shared_examples_for "the batch enqueued" do
-        it { is_expected.to eq true }
+      it { is_expected.to eq true }
 
-        it "marks the batch as enqueued" do
-          expect { enqueued }.
-            to change { example_batch.enqueued? }.from(false).to(true).
-            and change { example_batch.details.enqueued_at }.from(nil).to(Time.current)
-        end
+      it "marks the batch as enqueued" do
+        expect { enqueued }.
+        to change { example_batch.enqueued? }.from(false).to(true).
+        and change { example_batch.details.enqueued_at }.from(nil).to(Time.current)
+      end
 
-        it_behaves_like "a class with callback" do
-          include_context "with callbacks", :batch_enqueued
+      it_behaves_like "a class with callback" do
+        include_context "with callbacks", :batch_enqueued
 
-          subject(:callback_runner) { enqueued }
+        subject(:callback_runner) { enqueued }
 
-          let(:example) { example_batch }
-          let(:example_class) { example.class }
-        end
+        let(:example) { example_batch }
+        let(:example_class) { example.class }
+      end
 
-        it_behaves_like "a surveiled event", :batch_enqueued do
-          let(:expected_class) { example_batch_class.name }
+      it_behaves_like "a surveiled event", :batch_enqueued do
+        let(:expected_class) { example_batch_class.name }
 
-          before { enqueued }
-        end
+        before { enqueued }
       end
     end
   end
