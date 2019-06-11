@@ -1,47 +1,37 @@
 # frozen_string_literal: true
 
 RSpec.describe BatchProcessor::Processors::Parallel, type: :processor do
+  include_context "with an example batch"
+
   subject { described_class }
 
-  let(:batch) { instance_double(BatchProcessor::BatchBase) }
-  let(:collection) { [] }
+  let(:collection) do
+    Array.new(3) { Hash[*Faker::Lorem.words(2)] }
+  end
+  let(:job_class) { Class.new(BatchProcessor::BatchJob) }
 
   before do
-    allow(batch).to receive(:start)
-    allow(batch).to receive(:collection).and_return(collection)
-    allow(batch).to receive(:unfinished_jobs?).and_return(true)
-    allow(batch).to receive(:enqueued)
+    allow(example_batch).to receive(:collection).and_return(collection)
+    allow(example_batch).to receive(:job_class).and_return(job_class)
+    allow(job_class).to receive(:perform_later)
   end
 
   it { is_expected.to inherit_from BatchProcessor::ProcessorBase }
 
   describe "#process_collection_item" do
-    subject(:execute) { described_class.execute(batch: batch) }
+    subject(:execute) { described_class.execute(batch: example_batch) }
 
-    let(:collection) do
-      Array.new(2) { Hash[*Faker::Lorem.words(2)] }
-    end
-    let(:job_class) { Class.new(BatchProcessor::BatchJob) }
-
-    before do
-      allow(batch).to receive(:job_class).and_return(job_class)
-      allow(job_class).to receive(:perform_later)
-    end
-
-    it "marks the batch as enqueued" do
+    it "processes the collection in order" do
       execute
       collection.each { |item| expect(job_class).to have_received(:perform_later).with(item).ordered }
     end
   end
 
   describe ".collection_processed callback" do
-    subject(:execute) { described_class.execute(batch: batch) }
-
-    before { allow(batch).to receive(:enqueued) }
+    subject(:execute) { described_class.execute(batch: example_batch) }
 
     it "marks the batch as enqueued" do
-      execute
-      expect(batch).to have_received(:enqueued)
+      expect { execute }.to change { example_batch.enqueued? }.from(false).to(true)
     end
   end
 end

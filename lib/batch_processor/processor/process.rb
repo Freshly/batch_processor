@@ -18,6 +18,8 @@ module BatchProcessor
         run_callbacks(:collection_processed) { process_collection }
 
         batch.finish unless batch.unfinished_jobs?
+
+        self
       end
 
       def process_collection_item(_item)
@@ -26,8 +28,12 @@ module BatchProcessor
 
       private
 
+      def iterator_method
+        batch.collection.respond_to?(:find_each) ? :find_each : :each
+      end
+
       def process_collection
-        batch.collection.public_send(batch.collection.respond_to?(:find_each) ? :find_each : :each) do |item|
+        batch.collection.public_send(iterator_method) do |item|
           run_callbacks(:item_processed) { process_collection_item(item) }
         end
       end

@@ -31,7 +31,7 @@ RSpec.describe BatchProcessor::Batch::Job, type: :module do
   end
 
   describe ".job_class" do
-    subject(:job_class) { example_batch_class.__send__(:job_class) }
+    subject(:job_class) { example_batch_class.job_class }
 
     let(:example_job_class) { batchable_job_class }
 
