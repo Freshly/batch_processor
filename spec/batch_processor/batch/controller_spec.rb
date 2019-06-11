@@ -91,6 +91,53 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
     end
   end
 
+  describe "#enqueued", type: :with_frozen_time do
+    subject(:enqueued) { example_batch.enqueued }
+
+    context "when already enqueued" do
+      before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "enqueued_at", Time.now) }
+
+      it "raises" do
+        expect { enqueued }.to raise_error BatchProcessor::BatchAlreadyEnqueuedError
+      end
+    end
+
+    context "when not started" do
+      it "raises" do
+        expect { enqueued }.to raise_error BatchProcessor::BatchNotStartedError
+      end
+    end
+
+    context "when started" do
+      before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "started_at", Time.now) }
+
+      shared_examples_for "the batch enqueued" do
+        it { is_expected.to eq true }
+
+        it "marks the batch as enqueued" do
+          expect { enqueued }.
+            to change { example_batch.enqueued? }.from(false).to(true).
+            and change { example_batch.details.enqueued_at }.from(nil).to(Time.current)
+        end
+
+        it_behaves_like "a class with callback" do
+          include_context "with callbacks", :batch_enqueued
+
+          subject(:callback_runner) { enqueued }
+
+          let(:example) { example_batch }
+          let(:example_class) { example.class }
+        end
+
+        it_behaves_like "a surveiled event", :batch_enqueued do
+          let(:expected_class) { example_batch_class.name }
+
+          before { enqueued }
+        end
+      end
+    end
+  end
+
   describe "#finish", type: :with_frozen_time do
     subject(:finish) { example_batch.finish }
 
