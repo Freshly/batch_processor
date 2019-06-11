@@ -104,7 +104,10 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
       end
 
       it "is enqueued" do
-        expect { enqueue }.to change { ActiveJob::Base.queue_adapter.enqueued_jobs }.from([]).to([ expected_job ])
+        expect { enqueue }.
+          to change { ActiveJob::Base.queue_adapter.enqueued_jobs }.
+          from([]).
+          to([ hash_including(expected_job) ])
       end
     end
 

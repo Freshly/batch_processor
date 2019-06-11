@@ -53,3 +53,19 @@ Shoulda::Matchers.configure do |config|
     with.library :active_model
   end
 end
+
+module ActiveJob
+  module QueueAdapters
+    class TestAdapter
+      def job_to_hash(job, extras = {})
+        serialized = job.serialize
+        {
+          job: job.class,
+          args: serialized.fetch("arguments"),
+          queue: job.queue_name,
+          serialized: serialized
+        }.merge!(extras)
+      end
+    end
+  end
+end
