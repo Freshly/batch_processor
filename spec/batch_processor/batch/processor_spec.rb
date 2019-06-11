@@ -26,7 +26,7 @@ RSpec.describe BatchProcessor::Batch::Processor, type: :module do
   end
 
   describe ".processor_class" do
-    subject(:processor_class) { example_batch_class.__send__(:processor_class) }
+    subject(:processor_class) { example_batch_class.processor_class }
 
     context "with @processor_class" do
       before { example_batch_class.__send__(:with_sequential_processor) }
@@ -93,7 +93,14 @@ RSpec.describe BatchProcessor::Batch::Processor, type: :module do
 
     it "executes the processor" do
       process
-      expect(processor_class).to have_received(:execute).with(example_batch, **processor_options)
+      expect(processor_class).to have_received(:execute).with(batch: example_batch, **processor_options)
+    end
+  end
+
+  describe ".process" do
+    it_behaves_like "a class pass method", :process do
+      let(:test_class) { example_batch_class }
+      let(:call_class) { example_batch_class }
     end
   end
 end

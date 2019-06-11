@@ -11,7 +11,15 @@ module BatchProcessor
       end
 
       def collection
+        build_collection
+      end
+
+      def build_collection
         []
+      end
+
+      def collection_item_to_job_params(item)
+        item
       end
     end
   end

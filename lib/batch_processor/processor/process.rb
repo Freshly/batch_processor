@@ -34,7 +34,7 @@ module BatchProcessor
 
       def process_collection
         batch.collection.public_send(iterator_method) do |item|
-          run_callbacks(:item_processed) { process_collection_item(item) }
+          run_callbacks(:item_processed) { process_collection_item(batch.collection_item_to_job_params(item)) }
         end
       end
     end

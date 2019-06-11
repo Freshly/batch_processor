@@ -27,6 +27,16 @@ module BatchProcessor
           private strategy_method
         end
 
+        def process(*arguments)
+          new(*arguments).process
+        end
+
+        def processor_class
+          return @processor_class if defined?(@processor_class)
+
+          PROCESSOR_CLASS_BY_STRATEGY[:default]
+        end
+
         def inherited(base)
           dup = _processor_options.dup
           base._processor_options = dup.each { |k, v| dup[k] = v.dup }
@@ -35,19 +45,13 @@ module BatchProcessor
 
         private
 
-        def processor_class
-          return @processor_class if defined?(@processor_class)
-
-          PROCESSOR_CLASS_BY_STRATEGY[:default]
-        end
-
         def processor_option(option, value = nil)
           _processor_options[option.to_sym] = value
         end
       end
 
       def process
-        processor_class.execute(self, **_processor_options)
+        processor_class.execute(batch: self, **_processor_options)
       end
     end
   end

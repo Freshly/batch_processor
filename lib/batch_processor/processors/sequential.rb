@@ -7,7 +7,9 @@ module BatchProcessor
       option :sorted, default: false
 
       def process_collection_item(item)
-        batch.job_class.perform_now(item)
+        job = batch.job_class.new(item)
+        job.batch_id = batch.batch_id
+        job.perform_now
       rescue StandardError => exception
         raise exception unless continue_after_exception
       end
