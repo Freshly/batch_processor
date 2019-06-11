@@ -58,6 +58,7 @@ RSpec.describe BatchProcessor::Processor::Process, type: :module do
     before do
       allow(example_batch).to receive(:collection).and_return(collection)
       allow(example_processor).to receive(:process_collection_item)
+      allow(example_batch).to receive(:collection_item_to_job_params).and_call_original
     end
 
     shared_examples_for "the collection is processed" do
@@ -66,6 +67,7 @@ RSpec.describe BatchProcessor::Processor::Process, type: :module do
       it "processes all items" do
         process_collection
         expected_collection.each do |item|
+          expect(example_batch).to have_received(:collection_item_to_job_params).with(item).ordered
           expect(example_processor).to have_received(:process_collection_item).with(item).ordered
         end
       end

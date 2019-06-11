@@ -1,20 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe BatchProcessor::Processors::Parallel, type: :processor do
-  include_context "with an example batch"
+  include_context "with an example processor batch"
 
   subject { described_class }
-
-  let(:collection) do
-    Array.new(3) { Hash[*Faker::Lorem.words(2)] }
-  end
-  let(:job_class) { Class.new(BatchProcessor::BatchJob) }
-
-  before do
-    allow(example_batch).to receive(:collection).and_return(collection)
-    allow(example_batch).to receive(:job_class).and_return(job_class)
-    allow(job_class).to receive(:perform_later)
-  end
 
   it { is_expected.to inherit_from BatchProcessor::ProcessorBase }
 
@@ -23,7 +12,12 @@ RSpec.describe BatchProcessor::Processors::Parallel, type: :processor do
 
     it "processes the collection in order" do
       execute
-      collection.each { |item| expect(job_class).to have_received(:perform_later).with(item).ordered }
+
+      collection.each do |item|
+        expect(job_class).to have_received(:new).with(item).ordered
+        expect(collection_instances[item].batch_id).to eq example_batch.batch_id
+        expect(collection_instances[item]).to have_received(:enqueue).ordered
+      end
     end
   end
 
