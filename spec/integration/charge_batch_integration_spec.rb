@@ -43,6 +43,12 @@ RSpec.describe ChargeBatch, type: :integration do
       end
 
       it { is_expected.to have_attributes expected_attributes }
+
+      describe "#total_jobs_count" do
+        subject { details.total_jobs_count }
+
+        it { is_expected.to eq expected_size }
+      end
     end
 
     context "when the collection is empty" do
@@ -72,54 +78,41 @@ RSpec.describe ChargeBatch, type: :integration do
         expect(details.finished_at).to be_nil
       end
 
-      context "when all jobs succeed" do
+      shared_examples_for "jobs are processed as" do |result|
+        let(:result_count) { "#{result}_jobs_count".to_sym }
+
         it "handles counts as jobs are processed" do
           enqueued_jobs.take(2).each do |job|
-            expect { ActiveJob::Base.execute job[:serialized] }.
+            expect { ActiveJob::Base.execute job }.
               to change { details.pending_jobs_count }.by(-1).
-              and change { details.successful_jobs_count }.by(1)
+              and change { details.public_send(result_count) }.by(1).
+              and change { details.finished_jobs_count }.by(1)
           end
         end
 
         it "completes the batch when all jobs finish" do
-          expect { enqueued_jobs.each { |job| ActiveJob::Base.execute job[:serialized] } }.
-            to change { details.pending_jobs_count }.by(-expected_size).
-            and change { details.successful_jobs_count }.by(expected_size).
-            and change { details.finished_at }.from(nil).to(Time.current).
-            and change { batch.finished? }.from(false).to(true)
+          expect { enqueued_jobs.each(&ActiveJob::Base.method(:execute)) }.
+          to change { details.pending_jobs_count }.by(-expected_size).
+          and change { details.public_send(result_count) }.by(expected_size).
+          and change { details.finished_at }.from(nil).to(Time.current).
+          and change { batch.finished? }.from(false).to(true)
         end
+      end
+
+      context "when all jobs succeed" do
+        it_behaves_like "jobs are processed as", :successful
       end
 
       context "when all jobs fail" do
         let(:charge_day) { Date.new(1986, 04, 18) }
 
-        it "handles counts as jobs are processed" do
-          enqueued_jobs.take(2).each do |job|
-            expect { ActiveJob::Base.execute job[:serialized] }.
-              to change { details.pending_jobs_count }.by(-1).
-              and change { details.failed_jobs_count }.by(1)
-          end
-        end
-
-        it "completes the batch when all jobs finish" do
-          expect { enqueued_jobs.each { |job| ActiveJob::Base.execute job[:serialized] } }.
-            to change { details.pending_jobs_count }.by(-expected_size).
-            and change { details.failed_jobs_count }.by(expected_size).
-            and change { details.finished_at }.from(nil).to(Time.current).
-            and change { batch.finished? }.from(false).to(true)
-        end
+        it_behaves_like "jobs are processed as", :failed
       end
 
       context "when the batch is aborted" do
-        it "cancels any jobs run after the abort" do
-          batch.abort!
+        before { batch.abort! }
 
-          expect { enqueued_jobs.each { |job| ActiveJob::Base.execute job[:serialized] } }.
-            to change { details.pending_jobs_count }.by(-expected_size).
-            and change { details.canceled_jobs_count }.by(expected_size).
-            and change { details.finished_at }.from(nil).to(Time.current).
-            and change { batch.finished? }.from(false).to(true)
-        end
+        it_behaves_like "jobs are processed as", :canceled
       end
     end
   end

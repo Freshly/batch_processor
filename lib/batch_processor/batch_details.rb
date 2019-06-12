@@ -41,7 +41,7 @@ module BatchProcessor
     end
 
     def finished_jobs_count
-      sum_up(:successful_jobs_count, :failed_jobs_count)
+      sum_up(:successful_jobs_count, :failed_jobs_count, :canceled_jobs_count)
     end
 
     def total_jobs_count

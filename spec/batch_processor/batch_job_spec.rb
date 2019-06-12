@@ -13,6 +13,9 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
 
   let(:batch_id) { SecureRandom.hex }
   let(:arguments) { Faker::Lorem.words }
+  let(:example_class_name) { "Example#{Faker::Internet.domain_word.capitalize}" }
+
+  before { stub_const(example_class_name, example_class) }
 
   it { is_expected.to inherit_from ActiveJob::Base }
 
@@ -99,15 +102,10 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
     subject(:enqueue) { batch_job.enqueue }
 
     shared_examples_for "job is enqueued" do
-      let(:expected_job) do
-        { args: arguments, job: example_class, queue: "default" }
-      end
+      let(:expected_job) { batch_job.serialize }
 
       it "is enqueued" do
-        expect { enqueue }.
-          to change { ActiveJob::Base.queue_adapter.enqueued_jobs }.
-          from([]).
-          to([ hash_including(expected_job) ])
+        expect { enqueue }.to change { ActiveJob::Base.queue_adapter.enqueued_jobs }.from([]).to([ expected_job ])
       end
     end
 
@@ -130,7 +128,9 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
         it_behaves_like "the batch must be processing"
 
         context "when started" do
-          before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "started_at", Time.now) }
+          before do
+            Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "started_at", Time.now)
+          end
 
           it_behaves_like "job is enqueued"
 

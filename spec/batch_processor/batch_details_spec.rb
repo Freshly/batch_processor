@@ -107,7 +107,7 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
 
   describe "#finished_jobs_count" do
     it_behaves_like "a sum of counts", :finished_jobs_count do
-      let(:expected_sum) { successful_jobs_count + failed_jobs_count }
+      let(:expected_sum) { successful_jobs_count + failed_jobs_count + canceled_jobs_count }
     end
   end
 

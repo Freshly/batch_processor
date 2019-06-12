@@ -1,0 +1,5 @@
+# frozen_string_literal: true
+
+require_relative "custom_matchers/use_batch_processor_strategy"
+require_relative "custom_matchers/use_default_processor"
+require_relative "custom_matchers/use_parallel_processor"
