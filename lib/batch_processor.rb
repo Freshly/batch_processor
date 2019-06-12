@@ -17,6 +17,7 @@ module BatchProcessor
   class Error < StandardError; end
 
   class BatchError < Error; end
+  class BatchAbortedError < BatchError; end
   class ExistingBatchError < BatchError; end
   class BatchEmptyError < BatchError; end
   class BatchAlreadyStartedError < BatchError; end
@@ -27,6 +28,4 @@ module BatchProcessor
   class BatchNotProcessingError < BatchError; end
   class BatchNotAbortedError < BatchError; end
   class BatchNotStartedError < BatchError; end
-
-  class ProcessorError < Error; end
 end

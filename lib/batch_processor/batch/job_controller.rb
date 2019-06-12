@@ -53,7 +53,7 @@ module BatchProcessor
           details.pipelined do
             details.increment(:total_retries_count)
             details.increment(:pending_jobs_count)
-            details.decrement(:running_jobs_count)
+            details.decrement(:failed_jobs_count)
           end
         end
       end
