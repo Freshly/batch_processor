@@ -187,7 +187,7 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
         expect { job_retried }.
           to change  { example_batch.details.total_retries_count }.by(1).
           and change { example_batch.details.pending_jobs_count }.by(1).
-          and change { example_batch.details.running_jobs_count }.by(-1)
+          and change { example_batch.details.failed_jobs_count }.by(-1)
       end
 
       it_behaves_like "a class with callback" do

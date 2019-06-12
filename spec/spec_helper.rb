@@ -22,12 +22,18 @@ require_relative "../lib/batch_processor/rspec/active_job_test_adapter_monkeypat
 require_relative "support/shared_context/with_an_example_batch"
 require_relative "support/shared_context/with_an_example_processor"
 require_relative "support/shared_context/with_an_example_processor_batch"
+require_relative "support/shared_examples/the_batch_is_not_aborted"
+require_relative "support/shared_examples/the_batch_is_started_and_enqueued"
 require_relative "support/shared_examples/the_batch_must_be_processing"
+require_relative "support/shared_examples/the_counts_are_expected"
+require_relative "support/shared_examples/the_jobs_are_processed_as"
 
 require_relative "support/test_classes/custom_job"
 require_relative "support/test_classes/default_batch"
 require_relative "support/test_classes/red_green_batch"
 require_relative "support/test_classes/red_green_job"
+require_relative "support/test_classes/traffic_light_batch"
+require_relative "support/test_classes/traffic_light_job"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

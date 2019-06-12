@@ -17,7 +17,7 @@ module BatchProcessor
 
         run_callbacks(:collection_processed) { process_collection }
 
-        batch.finish unless batch.unfinished_jobs?
+        batch.finish unless (batch.finished? || batch.unfinished_jobs?)
 
         self
       end

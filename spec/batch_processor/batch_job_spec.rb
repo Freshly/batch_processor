@@ -164,7 +164,7 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
             expect { enqueue }.
               to change { batch.details.total_retries_count }.by(1).
               and change { batch.details.pending_jobs_count }.by(1).
-              and change { batch.details.running_jobs_count }.by(-1)
+              and change { batch.details.failed_jobs_count }.by(-1)
           end
         end
       end

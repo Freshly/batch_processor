@@ -23,14 +23,15 @@ module BatchProcessor
 
     after_perform(if: :batch_job?) { batch.job_success }
 
-    # Discard batch jobs which error as unexpectedly re-enqueued jobs can offset the counters
-    discard_on StandardError do |job, exception|
-      raise exception unless job.batch_job?
+    def rescue_with_handler(exception)
+      batch.job_canceled and return exception if exception.is_a?(BatchAbortedError)
 
-      job.batch.job_failure
+      batch.job_failure if batch_job?
+
+      result = super
+      result ||= exception if batch_job?
+      result
     end
-
-    discard_on(BatchAbortedError) { |job| job.batch.job_canceled }
 
     def serialize
       super.merge("batch_id" => batch_id) # rubocop:disable Style/StringHashKeys

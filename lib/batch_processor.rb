@@ -27,6 +27,4 @@ module BatchProcessor
   class BatchNotProcessingError < BatchError; end
   class BatchNotAbortedError < BatchError; end
   class BatchNotStartedError < BatchError; end
-
-  class ProcessorError < Error; end
 end
