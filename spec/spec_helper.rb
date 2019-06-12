@@ -11,6 +11,7 @@ require "shoulda-matchers"
 
 SimpleCov.start do
   add_filter "/spec/"
+  add_filter "/rspec/"
 end
 
 require "batch_processor"
