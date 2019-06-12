@@ -15,6 +15,9 @@ end
 
 require "batch_processor"
 
+require_relative "../lib/batch_processor/spec_helper"
+require_relative "../lib/batch_processor/rspec/active_job_test_adapter_monkeypatch"
+
 require_relative "support/shared_context/with_an_example_batch"
 require_relative "support/shared_context/with_an_example_processor"
 require_relative "support/shared_context/with_an_example_processor_batch"
@@ -51,21 +54,5 @@ Shoulda::Matchers.configure do |config|
   config.integrate do |with|
     with.test_framework :rspec
     with.library :active_model
-  end
-end
-
-module ActiveJob
-  module QueueAdapters
-    class TestAdapter
-      def job_to_hash(job, extras = {})
-        serialized = job.serialize
-        {
-          job: job.class,
-          args: serialized.fetch("arguments"),
-          queue: job.queue_name,
-          serialized: serialized
-        }.merge!(extras)
-      end
-    end
   end
 end
