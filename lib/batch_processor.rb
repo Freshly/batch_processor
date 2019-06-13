@@ -11,6 +11,7 @@ require "batch_processor/batch_details"
 require "batch_processor/processor_base"
 require "batch_processor/processors/parallel"
 require "batch_processor/processors/sequential"
+require "batch_processor/collection"
 require "batch_processor/batch_base"
 
 module BatchProcessor
