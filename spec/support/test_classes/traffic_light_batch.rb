@@ -3,6 +3,7 @@
 class TrafficLightBatch < BatchProcessor::BatchBase
   with_sequential_processor
   processor_option :continue_after_exception, true
+  processor_option :sorted, true
 
   class Collection < BatchCollection
     def items
