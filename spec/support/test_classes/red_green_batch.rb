@@ -8,6 +8,8 @@ class RedGreenBatch < BatchProcessor::BatchBase
     argument :color, allow_nil: false
     option :collection_size, default: 3
 
+    validates :color, inclusion: { in: %w[red green] }
+
     def items
       Array.new(collection_size) { color }
     end

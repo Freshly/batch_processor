@@ -11,6 +11,18 @@ RSpec.describe RedGreenBatch, type: :integration do
     end
   end
 
+  context "when the color is invalid" do
+    subject(:process) { batch.process }
+
+    let(:batch) { described_class.new(color: color) }
+    let(:color) { "blue" }
+
+    it "raises and sets errors" do
+      expect { process }.to raise_error BatchProcessor::BatchCollectionInvalidError
+      expect(batch.collection.errors.details[:color]).to eq([ { error: :inclusion, value: "blue" } ])
+    end
+  end
+
   context "with a color" do
     subject(:process) { batch.process }
 

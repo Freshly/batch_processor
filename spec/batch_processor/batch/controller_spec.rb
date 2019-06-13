@@ -32,6 +32,18 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
   describe "#start", type: :with_frozen_time do
     subject(:start) { example_batch.start }
 
+    let(:collection_valid?) { true }
+
+    before { allow(example_batch.collection).to receive(:valid?).and_return(collection_valid?) }
+
+    context "with the collection is invalid" do
+      let(:collection_valid?) { false }
+
+      it "raises" do
+        expect { start }.to raise_error BatchProcessor::BatchCollectionInvalidError
+      end
+    end
+
     context "when already started" do
       before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "started_at", Time.now) }
 

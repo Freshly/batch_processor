@@ -37,6 +37,7 @@ module BatchProcessor
       end
 
       def start
+        raise BatchProcessor::BatchCollectionInvalidError unless collection.valid?
         raise BatchProcessor::BatchAlreadyStartedError if started?
         raise BatchProcessor::BatchEmptyError if collection_items.empty? && !allow_empty?
 
