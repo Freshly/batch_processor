@@ -54,11 +54,14 @@ RSpec.describe BatchProcessor::Processor::Process, type: :module do
     subject(:process_collection) { example_processor.__send__(:process_collection) }
 
     let(:expected_collection) { %i[a b c] }
+    let(:collection) { BatchProcessor::Collection.new }
 
     before do
       allow(example_batch).to receive(:collection).and_return(collection)
       allow(example_processor).to receive(:process_collection_item)
-      allow(example_batch).to receive(:collection_item_to_job_params).and_call_original
+
+      allow(collection).to receive(:items).and_return(collection_items)
+      allow(collection).to receive(:item_to_job_params).and_call_original
     end
 
     shared_examples_for "the collection is processed" do
@@ -67,7 +70,7 @@ RSpec.describe BatchProcessor::Processor::Process, type: :module do
       it "processes all items" do
         process_collection
         expected_collection.each do |item|
-          expect(example_batch).to have_received(:collection_item_to_job_params).with(item).ordered
+          expect(collection).to have_received(:item_to_job_params).with(item).ordered
           expect(example_processor).to have_received(:process_collection_item).with(item).ordered
         end
       end
@@ -90,9 +93,7 @@ RSpec.describe BatchProcessor::Processor::Process, type: :module do
     end
 
     context "with collection#find_each method" do
-      before { allow(collection).to receive(:find_each).and_call_original }
-
-      let(:collection) { collection_class.new(expected_collection) }
+      let(:collection_items) { collection_class.new(expected_collection) }
 
       let(:collection_class) do
         Class.new do
@@ -112,7 +113,7 @@ RSpec.describe BatchProcessor::Processor::Process, type: :module do
     end
 
     context "without collection#find_each method" do
-      let(:collection) { expected_collection }
+      let(:collection_items) { expected_collection }
 
       it_behaves_like "the collection is processed"
     end

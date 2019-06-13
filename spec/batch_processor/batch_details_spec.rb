@@ -7,6 +7,8 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
 
   it { is_expected.to inherit_from Spicerack::RedisModel }
 
+  it { is_expected.to define_field :class_name, :string }
+
   it { is_expected.to define_field :started_at, :datetime }
   it { is_expected.to define_field :enqueued_at, :datetime }
   it { is_expected.to define_field :aborted_at, :datetime }
@@ -53,6 +55,22 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
     subject { described_class.redis_key_for_batch_id(batch_id) }
 
     it { is_expected.to eq "#{described_class}::#{batch_id}" }
+  end
+
+  describe ".class_name_for_batch_id" do
+    subject { described_class.class_name_for_batch_id(batch_id) }
+
+    context "with nothing in redis" do
+      it { is_expected.to be_nil }
+    end
+
+    context "with a value in redis" do
+      before { Redis.new.hset(described_class.redis_key_for_batch_id(batch_id), "class_name", class_name) }
+
+      let(:class_name) { "#{Faker::Internet.domain_word.capitalize}Batch" }
+
+      it { is_expected.to eq class_name }
+    end
   end
 
   shared_context "with job counts" do

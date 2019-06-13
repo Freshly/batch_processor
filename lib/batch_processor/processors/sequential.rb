@@ -6,6 +6,12 @@ module BatchProcessor
       option :continue_after_exception, default: false
       option :sorted, default: false
 
+      class << self
+        def disable_retries?
+          true
+        end
+      end
+
       def process_collection_item(item)
         job = batch.job_class.new(item)
         job.batch_id = batch.batch_id

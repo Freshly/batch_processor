@@ -5,6 +5,8 @@ module BatchProcessor
   class BatchDetails < Spicerack::RedisModel
     attr_reader :batch_id
 
+    field :class_name, :string
+
     field :started_at, :datetime
     field :enqueued_at, :datetime
     field :aborted_at, :datetime
@@ -28,6 +30,10 @@ module BatchProcessor
     class << self
       def redis_key_for_batch_id(batch_id)
         "#{name}::#{batch_id}"
+      end
+
+      def class_name_for_batch_id(batch_id)
+        default_redis.hget(redis_key_for_batch_id(batch_id), "class_name")
       end
     end
 

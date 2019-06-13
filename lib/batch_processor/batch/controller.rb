@@ -10,6 +10,7 @@ module BatchProcessor
         batch_callbacks :started, :enqueued, :aborted, :finished
 
         delegate :allow_empty?, to: :class
+        delegate :name, to: :class, prefix: true
         delegate :pipelined, to: :details
       end
 
@@ -37,12 +38,13 @@ module BatchProcessor
 
       def start
         raise BatchProcessor::BatchAlreadyStartedError if started?
-        raise BatchProcessor::BatchEmptyError if collection.empty? && !allow_empty?
+        raise BatchProcessor::BatchEmptyError if collection_items.empty? && !allow_empty?
 
         run_callbacks(:batch_started) do
-          collection_size = collection.count
+          collection_size = collection_items.count
 
           pipelined do
+            details.class_name = class_name
             details.started_at = Time.current
             details.size = collection_size
             details.pending_jobs_count = collection_size
