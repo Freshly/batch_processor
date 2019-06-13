@@ -24,7 +24,7 @@ RSpec.describe BatchProcessor::Processors::Sequential, type: :processor do
       it "processes the batch" do
         execute
 
-        collection.each do |item|
+        collection_items.each do |item|
           expect(job_class).to have_received(:new).with(item).ordered
           expect(collection_instances[item].batch_id).to eq example_batch.batch_id
           expect(collection_instances[item]).to have_received(:perform_now).ordered
@@ -35,7 +35,7 @@ RSpec.describe BatchProcessor::Processors::Sequential, type: :processor do
     context "with error" do
       let(:options) { Hash[:continue_after_exception, continue_after_exception] }
 
-      before { allow(collection_instances[collection[1]]).to receive(:perform_now).and_raise(RuntimeError) }
+      before { allow(collection_instances[collection_items[1]]).to receive(:perform_now).and_raise(RuntimeError) }
 
       context "when #continue_after_exception" do
         let(:continue_after_exception) { true }
@@ -49,9 +49,9 @@ RSpec.describe BatchProcessor::Processors::Sequential, type: :processor do
         it "raises" do
           expect { execute }.to raise_error RuntimeError
 
-          expect(job_class).to have_received(:new).with(collection[0]).ordered
-          expect(job_class).to have_received(:new).with(collection[1]).ordered
-          expect(job_class).not_to have_received(:new).with(collection[2])
+          expect(job_class).to have_received(:new).with(collection_items[0]).ordered
+          expect(job_class).to have_received(:new).with(collection_items[1]).ordered
+          expect(job_class).not_to have_received(:new).with(collection_items[2])
         end
       end
     end
@@ -68,11 +68,11 @@ RSpec.describe BatchProcessor::Processors::Sequential, type: :processor do
 
     subject { described_class.new(batch: example_batch, sorted: sorted).__send__(:iterator_method) }
 
-    let(:collection) { double(find_each: nil) }
+    let(:collection_items) { double(find_each: nil) }
 
     before do
-      allow(example_batch).to receive(:collection).and_return(collection)
-      allow(collection).to receive(:find_each)
+      allow(example_batch).to receive(:collection_items).and_return(collection_items)
+      allow(collection_items).to receive(:find_each)
     end
 
     context "when sorted" do

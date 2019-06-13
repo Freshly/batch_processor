@@ -13,7 +13,7 @@ RSpec.describe BatchProcessor::Processors::Parallel, type: :processor do
     it "processes the collection in order" do
       execute
 
-      collection.each do |item|
+      collection_items.each do |item|
         expect(job_class).to have_received(:new).with(item).ordered
         expect(collection_instances[item].batch_id).to eq example_batch.batch_id
         expect(collection_instances[item]).to have_received(:enqueue).ordered

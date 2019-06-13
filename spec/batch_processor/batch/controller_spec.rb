@@ -41,7 +41,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
     end
 
     context "when not started" do
-      before { allow(example_batch).to receive(:collection).and_return(collection) }
+      before { allow(example_batch).to receive(:collection_items).and_return(collection_items) }
 
       shared_examples_for "the batch starts" do
         it { is_expected.to eq true }
@@ -51,8 +51,8 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
             to change { example_batch.details.class_name }.from(nil).to(example_batch_name).
             and change { example_batch.started? }.from(false).to(true).
             and change { example_batch.details.started_at }.from(nil).to(Time.current).
-            and change { example_batch.details.size }.from(0).to(collection.size).
-            and change { example_batch.details.pending_jobs_count }.from(0).to(collection.size)
+            and change { example_batch.details.size }.from(0).to(collection_items.size).
+            and change { example_batch.details.pending_jobs_count }.from(0).to(collection_items.size)
         end
 
         it_behaves_like "a class with callback" do
@@ -72,7 +72,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
       end
 
       context "with an empty collection" do
-        let(:collection) { [] }
+        let(:collection_items) { [] }
 
         context "when not allow_blank?" do
           it "raises" do
@@ -82,7 +82,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
       end
 
       context "with a present collection" do
-        let(:collection) { Faker::Lorem.words }
+        let(:collection_items) { Faker::Lorem.words }
 
         it_behaves_like "the batch starts"
       end
