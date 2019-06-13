@@ -76,7 +76,7 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
 
     context "when not started" do
       it "raises" do
-        expect { subject }.to raise_error BatchProcessor::BatchNotStartedError
+        expect { subject }.to raise_error BatchProcessor::NotStartedError
       end
     end
 
@@ -91,7 +91,7 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
         end
 
         it "raises" do
-          expect { subject }.to raise_error BatchProcessor::BatchAlreadyFinishedError
+          expect { subject }.to raise_error BatchProcessor::AlreadyFinishedError
         end
       end
 
@@ -127,7 +127,7 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
 
     context "when not started" do
       it "raises" do
-        expect { subject }.to raise_error BatchProcessor::BatchNotStartedError
+        expect { subject }.to raise_error BatchProcessor::NotStartedError
       end
     end
 
@@ -140,7 +140,7 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
         before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "finished_at", Time.now) }
 
         it "raises" do
-          expect { subject }.to raise_error BatchProcessor::BatchAlreadyFinishedError
+          expect { subject }.to raise_error BatchProcessor::AlreadyFinishedError
         end
       end
 
@@ -212,7 +212,7 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
 
     context "when not aborted" do
       it "raises" do
-        expect { subject }.to raise_error BatchProcessor::BatchNotAbortedError
+        expect { subject }.to raise_error BatchProcessor::NotAbortedError
       end
     end
 

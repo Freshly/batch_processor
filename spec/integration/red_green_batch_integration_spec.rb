@@ -18,7 +18,7 @@ RSpec.describe RedGreenBatch, type: :integration do
     let(:color) { "blue" }
 
     it "raises and sets errors" do
-      expect { process }.to raise_error BatchProcessor::BatchCollectionInvalidError
+      expect { process }.to raise_error BatchProcessor::CollectionInvalidError
       expect(batch.collection.errors.details[:color]).to eq([ { error: :inclusion, value: "blue" } ])
     end
   end

@@ -9,59 +9,59 @@ RSpec.describe BatchProcessor do
     it { is_expected.to inherit_from StandardError }
   end
 
-  describe described_class::BatchError do
+  describe described_class::Error do
     it { is_expected.to inherit_from BatchProcessor::Error }
   end
 
-  describe described_class::BatchNotFound do
-    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  describe described_class::NotFoundError do
+    it { is_expected.to inherit_from BatchProcessor::Error }
   end
 
-  describe described_class::BatchClassMissing do
-    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  describe described_class::ClassMissingError do
+    it { is_expected.to inherit_from BatchProcessor::Error }
   end
 
-  describe described_class::ExistingBatchError do
-    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  describe described_class::CollectionEmptyError do
+    it { is_expected.to inherit_from BatchProcessor::Error }
   end
 
-  describe described_class::BatchEmptyError do
-    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  describe described_class::CollectionInvalidError do
+    it { is_expected.to inherit_from BatchProcessor::Error }
   end
 
-  describe described_class::BatchCollectionInvalidError do
-    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  describe described_class::AlreadyExistsError do
+    it { is_expected.to inherit_from BatchProcessor::Error }
   end
 
-  describe described_class::BatchAlreadyStartedError do
-    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  describe described_class::AlreadyStartedError do
+    it { is_expected.to inherit_from BatchProcessor::Error }
   end
 
-  describe described_class::BatchAlreadyEnqueuedError do
-    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  describe described_class::AlreadyEnqueuedError do
+    it { is_expected.to inherit_from BatchProcessor::Error }
   end
 
-  describe described_class::BatchAlreadyAbortedError do
-    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  describe described_class::AlreadyAbortedError do
+    it { is_expected.to inherit_from BatchProcessor::Error }
   end
 
-  describe described_class::BatchAlreadyFinishedError do
-    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  describe described_class::AlreadyFinishedError do
+    it { is_expected.to inherit_from BatchProcessor::Error }
   end
 
-  describe described_class::BatchStillProcessingError do
-    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  describe described_class::StillProcessingError do
+    it { is_expected.to inherit_from BatchProcessor::Error }
   end
 
-  describe described_class::BatchNotProcessingError do
-    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  describe described_class::NotProcessingError do
+    it { is_expected.to inherit_from BatchProcessor::Error }
   end
 
-  describe described_class::BatchNotAbortedError do
-    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  describe described_class::NotAbortedError do
+    it { is_expected.to inherit_from BatchProcessor::Error }
   end
 
-  describe described_class::BatchNotStartedError do
-    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  describe described_class::NotStartedError do
+    it { is_expected.to inherit_from BatchProcessor::Error }
   end
 end
