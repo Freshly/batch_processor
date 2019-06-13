@@ -28,9 +28,7 @@ module BatchProcessor
 
       batch.job_failure if batch_job?
 
-      result = super
-      result ||= exception if batch_job?
-      result
+      super
     end
 
     def retry_job(*)

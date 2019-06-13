@@ -312,12 +312,10 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
           allow(batch_job.batch).to receive(:job_running).and_call_original
         end
 
-        it { is_expected.to be_an_instance_of(StandardError) }
-        it { is_expected.to have_attributes(message: reason) }
-
         it "updates the batch" do
           expect { perform_now }.
-            to change { example_batch.details.pending_jobs_count }.by(-1).
+            to raise_error(StandardError, reason).
+            and change { example_batch.details.pending_jobs_count }.by(-1).
             and change { example_batch.details.failed_jobs_count }.by(1)
 
           # The job fails in this execution, so we need to check the runner was called
