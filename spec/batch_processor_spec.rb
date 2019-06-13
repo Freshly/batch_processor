@@ -29,6 +29,10 @@ RSpec.describe BatchProcessor do
     it { is_expected.to inherit_from BatchProcessor::BatchError }
   end
 
+  describe described_class::BatchCollectionInvalidError do
+    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  end
+
   describe described_class::BatchAlreadyStartedError do
     it { is_expected.to inherit_from BatchProcessor::BatchError }
   end
