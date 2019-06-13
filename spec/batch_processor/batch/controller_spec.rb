@@ -201,6 +201,74 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
     end
   end
 
+  describe "#clear!", type: :with_frozen_time do
+    subject(:clear!) { example_batch.clear! }
+
+    context "when not aborted" do
+      it "raises" do
+        expect { clear! }.to raise_error BatchProcessor::NotAbortedError
+      end
+    end
+
+    context "when aborted" do
+      before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "aborted_at", Time.now) }
+
+      context "when already finished" do
+        before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "finished_at", Time.now) }
+
+        it "raises" do
+          expect { clear! }.to raise_error BatchProcessor::AlreadyFinishedError
+        end
+      end
+
+      context "when already cleared" do
+        before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "cleared_at", Time.now) }
+
+        it "raises" do
+          expect { clear! }.to raise_error BatchProcessor::AlreadyClearedError
+        end
+      end
+
+      context "when not cleared" do
+        let(:pending_jobs_count) { rand(5..10) }
+        let(:running_jobs_count) { rand(5..10) }
+        let(:expected_cleared_jobs_count) { pending_jobs_count + running_jobs_count }
+
+        before do
+          key = BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id)
+          Redis.new.hset(key, "pending_jobs_count", pending_jobs_count)
+          Redis.new.hset(key, "running_jobs_count", running_jobs_count)
+        end
+
+        it { is_expected.to eq true }
+
+        it "clears the batch and marks it as such" do
+          expect { clear! }.
+            to change { example_batch.details.cleared_at }.from(nil).to(Time.current).
+            and change { example_batch.details.finished_at }.from(nil).to(Time.current).
+            and change { example_batch.details.pending_jobs_count }.from(pending_jobs_count).to(0).
+            and change { example_batch.details.running_jobs_count }.from(running_jobs_count).to(0).
+            and change { example_batch.details.cleared_jobs_count }.from(0).to(expected_cleared_jobs_count)
+        end
+
+        it_behaves_like "a class with callback" do
+          include_context "with callbacks", :batch_cleared
+
+          subject(:callback_runner) { clear! }
+
+          let(:example) { example_batch }
+          let(:example_class) { example.class }
+        end
+
+        it_behaves_like "a surveiled event", :batch_cleared do
+          let(:expected_class) { example_batch_class.name }
+
+          before { clear! }
+        end
+      end
+    end
+  end
+
   describe "#finish", type: :with_frozen_time do
     subject(:finish) { example_batch.finish }
 

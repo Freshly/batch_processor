@@ -45,6 +45,10 @@ RSpec.describe BatchProcessor do
     it { is_expected.to inherit_from BatchProcessor::Error }
   end
 
+  describe described_class::AlreadyClearedError do
+    it { is_expected.to inherit_from BatchProcessor::Error }
+  end
+
   describe described_class::AlreadyFinishedError do
     it { is_expected.to inherit_from BatchProcessor::Error }
   end

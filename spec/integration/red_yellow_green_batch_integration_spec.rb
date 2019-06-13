@@ -15,6 +15,7 @@ RSpec.describe RedYellowGreenBatch, type: :integration do
     expect(alerter.count_batch_started).to eq 1
     expect(alerter.count_batch_enqueued).to eq 1
     expect(alerter.count_batch_aborted).to eq 0
+    expect(alerter.count_batch_cleared).to eq 0
     expect(alerter.count_batch_finished).to eq 0
   end
 
@@ -42,6 +43,7 @@ RSpec.describe RedYellowGreenBatch, type: :integration do
         expect(alerter.count_batch_started).to eq 1
         expect(alerter.count_batch_enqueued).to eq 1
         expect(alerter.count_batch_aborted).to eq 0
+        expect(alerter.count_batch_cleared).to eq 0
         expect(alerter.count_batch_finished).to eq 0
       end
 
@@ -76,6 +78,7 @@ RSpec.describe RedYellowGreenBatch, type: :integration do
         expect(alerter.count_batch_started).to eq 1
         expect(alerter.count_batch_enqueued).to eq 1
         expect(alerter.count_batch_aborted).to eq 0
+        expect(alerter.count_batch_cleared).to eq 0
         expect(alerter.count_batch_finished).to eq 0
       end
 
@@ -137,6 +140,50 @@ RSpec.describe RedYellowGreenBatch, type: :integration do
     end
   end
 
+  context "when the batch is cleared" do
+    subject { details }
+
+    before do
+      processor = ActiveJob::Base.method(:execute)
+      enqueued_jobs.shift(2).each(&processor)
+      batch.abort!
+      batch.clear!
+    end
+
+    let(:expected_attributes) do
+      { size: expected_size,
+        enqueued_jobs_count: expected_size,
+        pending_jobs_count: 0,
+        running_jobs_count: 0,
+        total_retries_count: 1,
+        successful_jobs_count: 0,
+        failed_jobs_count: 1,
+        canceled_jobs_count: 0,
+        cleared_jobs_count: 2,
+        aborted_at: Time.current,
+        finished_at: Time.current }
+    end
+
+    it { is_expected.to have_attributes expected_attributes }
+
+    it "triggers the right batch callbacks" do
+      expect(alerter.count_batch_started).to eq 1
+      expect(alerter.count_batch_enqueued).to eq 1
+      expect(alerter.count_batch_aborted).to eq 1
+      expect(alerter.count_batch_cleared).to eq 1
+      expect(alerter.count_batch_finished).to eq 1
+    end
+
+    it "triggers the right job callbacks" do
+      expect(alerter.count_job_enqueued).to eq 3
+      expect(alerter.count_job_running).to eq 2
+      expect(alerter.count_job_retried).to eq 1
+      expect(alerter.count_job_canceled).to eq 0
+      expect(alerter.count_job_success).to eq 0
+      expect(alerter.count_job_failure).to eq 2
+    end
+  end
+
   context "when all jobs are finished" do
     subject { details }
 
@@ -161,6 +208,7 @@ RSpec.describe RedYellowGreenBatch, type: :integration do
       expect(alerter.count_batch_started).to eq 1
       expect(alerter.count_batch_enqueued).to eq 1
       expect(alerter.count_batch_aborted).to eq 0
+      expect(alerter.count_batch_cleared).to eq 0
       expect(alerter.count_batch_finished).to eq 1
     end
 

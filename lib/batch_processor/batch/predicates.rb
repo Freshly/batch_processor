@@ -7,7 +7,7 @@ module BatchProcessor
       extend ActiveSupport::Concern
 
       included do
-        date_predicate :started, :enqueued, :aborted, :finished
+        date_predicate :started, :enqueued, :aborted, :cleared, :finished
 
         job_count_predicate :enqueued, :pending, :running, :failed, :canceled, :unfinished, :finished
       end
