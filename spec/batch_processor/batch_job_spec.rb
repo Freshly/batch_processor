@@ -92,6 +92,54 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
     end
   end
 
+  describe "#retry_job" do
+    subject(:retry_job) { batch_job.retry_job(options) }
+
+    before { allow(batch_job).to receive(:enqueue) }
+
+    let(:options) { {} }
+
+    shared_examples_for "the job is retried" do
+      it "retries" do
+        retry_job
+        expect(batch_job).to have_received(:enqueue).with(options)
+      end
+    end
+
+    context "without a batch" do
+      let(:batch_id) { nil }
+
+      it_behaves_like "the job is retried"
+    end
+
+    context "with a batch" do
+      include_context "with the example batch stored in redis"
+
+      let(:processor_class) { double }
+
+      before do
+        batch_job.batch_id = batch_id
+        allow(batch_job.batch).to receive(:processor_class).and_return(processor_class)
+        allow(processor_class).to receive(:disable_retries?).and_return(disable_retries?)
+      end
+
+      context "with retries disabled" do
+        let(:disable_retries?) { true }
+
+        it "is not retried" do
+          retry_job
+          expect(batch_job).not_to have_received(:enqueue)
+        end
+      end
+
+      context "with retries enabled" do
+        let(:disable_retries?) { false }
+
+        it_behaves_like "the job is retried"
+      end
+    end
+  end
+
   describe "#batch_job?" do
     subject { batch_job.batch_job? }
 
