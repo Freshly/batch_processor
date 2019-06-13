@@ -25,9 +25,9 @@ require_relative "support/shared_context/with_an_example_processor_batch"
 require_relative "support/shared_examples/the_batch_is_not_aborted"
 require_relative "support/shared_examples/the_batch_is_started_and_enqueued"
 require_relative "support/shared_examples/the_batch_must_be_processing"
-require_relative "support/shared_examples/the_counts_are_expected"
 require_relative "support/shared_examples/the_jobs_are_processed_as"
 
+require_relative "support/test_classes/alerter"
 require_relative "support/test_classes/default_job"
 require_relative "support/test_classes/default_batch"
 require_relative "support/test_classes/red_green_batch"
@@ -35,6 +35,9 @@ require_relative "support/test_classes/red_green_job"
 require_relative "support/test_classes/traffic_light_batch"
 require_relative "support/test_classes/traffic_light_job"
 require_relative "support/test_classes/red_yellow_green_batch"
+require_relative "support/test_classes/stop_or_go_batch"
+require_relative "support/test_classes/stop_or_go_job"
+require_relative "support/test_classes/always_go_batch"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
