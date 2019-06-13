@@ -40,7 +40,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
       let(:collection_valid?) { false }
 
       it "raises" do
-        expect { start }.to raise_error BatchProcessor::BatchCollectionInvalidError
+        expect { start }.to raise_error BatchProcessor::CollectionInvalidError
       end
     end
 
@@ -48,7 +48,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
       before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "started_at", Time.now) }
 
       it "raises" do
-        expect { start }.to raise_error BatchProcessor::BatchAlreadyStartedError
+        expect { start }.to raise_error BatchProcessor::AlreadyStartedError
       end
     end
 
@@ -88,7 +88,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
 
         context "when not allow_blank?" do
           it "raises" do
-            expect { start }.to raise_error BatchProcessor::BatchEmptyError
+            expect { start }.to raise_error BatchProcessor::CollectionEmptyError
           end
         end
       end
@@ -108,13 +108,13 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
       before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "enqueued_at", Time.now) }
 
       it "raises" do
-        expect { enqueued }.to raise_error BatchProcessor::BatchAlreadyEnqueuedError
+        expect { enqueued }.to raise_error BatchProcessor::AlreadyEnqueuedError
       end
     end
 
     context "when not started" do
       it "raises" do
-        expect { enqueued }.to raise_error BatchProcessor::BatchNotStartedError
+        expect { enqueued }.to raise_error BatchProcessor::NotStartedError
       end
     end
 
@@ -151,7 +151,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
 
     context "when not started" do
       it "raises" do
-        expect { abort! }.to raise_error BatchProcessor::BatchNotStartedError
+        expect { abort! }.to raise_error BatchProcessor::NotStartedError
       end
     end
 
@@ -162,7 +162,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
         before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "aborted_at", Time.now) }
 
         it "raises" do
-          expect { abort! }.to raise_error BatchProcessor::BatchAlreadyAbortedError
+          expect { abort! }.to raise_error BatchProcessor::AlreadyAbortedError
         end
       end
 
@@ -170,7 +170,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
         before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "finished_at", Time.now) }
 
         it "raises" do
-          expect { abort! }.to raise_error BatchProcessor::BatchAlreadyFinishedError
+          expect { abort! }.to raise_error BatchProcessor::AlreadyFinishedError
         end
       end
 
@@ -208,7 +208,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
       before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "finished_at", Time.now) }
 
       it "raises" do
-        expect { finish }.to raise_error BatchProcessor::BatchAlreadyFinishedError
+        expect { finish }.to raise_error BatchProcessor::AlreadyFinishedError
       end
     end
 
@@ -219,7 +219,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
         end
 
         it "raises" do
-          expect { finish }.to raise_error BatchProcessor::BatchStillProcessingError
+          expect { finish }.to raise_error BatchProcessor::StillProcessingError
         end
       end
 

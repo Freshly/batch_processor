@@ -17,18 +17,17 @@ require "batch_processor/batch_base"
 module BatchProcessor
   class Error < StandardError; end
 
-  class BatchError < Error; end
-  class BatchNotFound < BatchError; end
-  class BatchClassMissing < BatchError; end
-  class ExistingBatchError < BatchError; end
-  class BatchEmptyError < BatchError; end
-  class BatchCollectionInvalidError < BatchError; end
-  class BatchAlreadyStartedError < BatchError; end
-  class BatchAlreadyEnqueuedError < BatchError; end
-  class BatchAlreadyFinishedError < BatchError; end
-  class BatchAlreadyAbortedError < BatchError; end
-  class BatchStillProcessingError < BatchError; end
-  class BatchNotProcessingError < BatchError; end
-  class BatchNotAbortedError < BatchError; end
-  class BatchNotStartedError < BatchError; end
+  class NotFoundError < Error; end
+  class ClassMissingError < Error; end
+  class CollectionEmptyError < Error; end
+  class CollectionInvalidError < Error; end
+  class AlreadyExistsError < Error; end
+  class AlreadyStartedError < Error; end
+  class AlreadyEnqueuedError < Error; end
+  class AlreadyFinishedError < Error; end
+  class AlreadyAbortedError < Error; end
+  class StillProcessingError < Error; end
+  class NotProcessingError < Error; end
+  class NotAbortedError < Error; end
+  class NotStartedError < Error; end
 end

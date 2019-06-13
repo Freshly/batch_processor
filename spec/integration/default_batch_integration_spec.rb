@@ -5,7 +5,7 @@ RSpec.describe DefaultBatch, type: :integration do
     subject(:process) { described_class.process }
 
     it "raises" do
-      expect { process }.to raise_error BatchProcessor::BatchEmptyError
+      expect { process }.to raise_error BatchProcessor::CollectionEmptyError
     end
   end
 end

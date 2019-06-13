@@ -5,13 +5,13 @@ RSpec.shared_examples_for "the batch must be processing" do
     before { Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "finished_at", Time.now) }
 
     it "raises" do
-      expect { subject }.to raise_error BatchProcessor::BatchNotProcessingError
+      expect { subject }.to raise_error BatchProcessor::NotProcessingError
     end
   end
 
   context "when not started" do
     it "raises" do
-      expect { subject }.to raise_error BatchProcessor::BatchNotProcessingError
+      expect { subject }.to raise_error BatchProcessor::NotProcessingError
     end
   end
 end

@@ -26,7 +26,7 @@ RSpec.describe BatchProcessor::Batch::Core, type: :module do
 
     context "without a class_name" do
       it "raises" do
-        expect { find }.to raise_error BatchProcessor::BatchNotFound, "A Batch with id #{batch_id} was not found."
+        expect { find }.to raise_error BatchProcessor::NotFoundError, "A Batch with id #{batch_id} was not found."
       end
     end
 
@@ -38,7 +38,7 @@ RSpec.describe BatchProcessor::Batch::Core, type: :module do
 
       context "when invalid" do
         it "raises" do
-          expect { find }.to raise_error BatchProcessor::BatchClassMissing, "#{class_name} is not a class"
+          expect { find }.to raise_error BatchProcessor::ClassMissingError, "#{class_name} is not a class"
         end
       end
 

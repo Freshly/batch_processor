@@ -29,14 +29,14 @@ module BatchProcessor
       end
 
       def job_enqueued
-        raise BatchProcessor::BatchAlreadyEnqueuedError if enqueued?
-        raise BatchProcessor::BatchNotProcessingError unless processing?
+        raise BatchProcessor::AlreadyEnqueuedError if enqueued?
+        raise BatchProcessor::NotProcessingError unless processing?
 
         run_callbacks(__method__) { details.increment(:enqueued_jobs_count) }
       end
 
       def job_running
-        raise BatchProcessor::BatchNotProcessingError unless processing?
+        raise BatchProcessor::NotProcessingError unless processing?
 
         run_callbacks(__method__) do
           details.pipelined do
@@ -47,7 +47,7 @@ module BatchProcessor
       end
 
       def job_retried
-        raise BatchProcessor::BatchNotProcessingError unless processing?
+        raise BatchProcessor::NotProcessingError unless processing?
 
         run_callbacks(__method__) do
           details.pipelined do
@@ -59,8 +59,8 @@ module BatchProcessor
       end
 
       def job_success
-        raise BatchProcessor::BatchNotStartedError unless started?
-        raise BatchProcessor::BatchAlreadyFinishedError if finished?
+        raise BatchProcessor::NotStartedError unless started?
+        raise BatchProcessor::AlreadyFinishedError if finished?
 
         run_callbacks(__method__) do
           details.pipelined do
@@ -71,8 +71,8 @@ module BatchProcessor
       end
 
       def job_failure
-        raise BatchProcessor::BatchNotStartedError unless started?
-        raise BatchProcessor::BatchAlreadyFinishedError if finished?
+        raise BatchProcessor::NotStartedError unless started?
+        raise BatchProcessor::AlreadyFinishedError if finished?
 
         run_callbacks(__method__) do
           details.pipelined do
@@ -83,7 +83,7 @@ module BatchProcessor
       end
 
       def job_canceled
-        raise BatchProcessor::BatchNotAbortedError unless aborted?
+        raise BatchProcessor::NotAbortedError unless aborted?
 
         run_callbacks(__method__) do
           details.pipelined do

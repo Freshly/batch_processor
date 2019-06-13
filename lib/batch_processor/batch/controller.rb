@@ -37,9 +37,9 @@ module BatchProcessor
       end
 
       def start
-        raise BatchProcessor::BatchCollectionInvalidError unless collection.valid?
-        raise BatchProcessor::BatchAlreadyStartedError if started?
-        raise BatchProcessor::BatchEmptyError if collection_items.empty? && !allow_empty?
+        raise BatchProcessor::CollectionInvalidError unless collection.valid?
+        raise BatchProcessor::AlreadyStartedError if started?
+        raise BatchProcessor::CollectionEmptyError if collection_items.empty? && !allow_empty?
 
         run_callbacks(:batch_started) do
           collection_size = collection_items.count
@@ -56,8 +56,8 @@ module BatchProcessor
       end
 
       def enqueued
-        raise BatchProcessor::BatchAlreadyEnqueuedError if enqueued?
-        raise BatchProcessor::BatchNotStartedError unless started?
+        raise BatchProcessor::AlreadyEnqueuedError if enqueued?
+        raise BatchProcessor::NotStartedError unless started?
 
         run_callbacks(:batch_enqueued) { details.enqueued_at = Time.current }
 
@@ -65,9 +65,9 @@ module BatchProcessor
       end
 
       def abort!
-        raise BatchProcessor::BatchNotStartedError unless started?
-        raise BatchProcessor::BatchAlreadyFinishedError if finished?
-        raise BatchProcessor::BatchAlreadyAbortedError if aborted?
+        raise BatchProcessor::NotStartedError unless started?
+        raise BatchProcessor::AlreadyFinishedError if finished?
+        raise BatchProcessor::AlreadyAbortedError if aborted?
 
         run_callbacks(:batch_aborted) { details.aborted_at = Time.current }
 
@@ -75,8 +75,8 @@ module BatchProcessor
       end
 
       def finish
-        raise BatchProcessor::BatchAlreadyFinishedError if finished?
-        raise BatchProcessor::BatchStillProcessingError if unfinished_jobs?
+        raise BatchProcessor::AlreadyFinishedError if finished?
+        raise BatchProcessor::StillProcessingError if unfinished_jobs?
 
         run_callbacks(:batch_finished) { details.finished_at = Time.current }
 
