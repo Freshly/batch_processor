@@ -10,6 +10,7 @@ module BatchProcessor
         batch_callbacks :started, :enqueued, :aborted, :finished
 
         delegate :allow_empty?, to: :class
+        delegate :name, to: :class, prefix: true
         delegate :pipelined, to: :details
       end
 
@@ -43,6 +44,7 @@ module BatchProcessor
           collection_size = collection.count
 
           pipelined do
+            details.class_name = class_name
             details.started_at = Time.current
             details.size = collection_size
             details.pending_jobs_count = collection_size

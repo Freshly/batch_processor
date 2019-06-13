@@ -18,6 +18,18 @@ module BatchProcessor
     include BatchProcessor::Batch::Controller
     include BatchProcessor::Batch::JobController
 
+    class << self
+      def find(batch_id)
+        class_name = BatchProcessor::BatchDetails.class_name_for_batch_id(batch_id)
+        raise BatchProcessor::BatchNotFound, "A Batch with id #{batch_id} was not found." if class_name.nil?
+
+        batch_class = class_name.safe_constantize
+        raise BatchProcessor::BatchClassMissing, "#{class_name} is not a class" if batch_class.nil?
+
+        batch_class.new(batch_id: batch_id)
+      end
+    end
+
     def details
       BatchProcessor::BatchDetails.new(batch_id)
     end

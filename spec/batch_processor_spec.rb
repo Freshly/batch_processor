@@ -13,6 +13,14 @@ RSpec.describe BatchProcessor do
     it { is_expected.to inherit_from BatchProcessor::Error }
   end
 
+  describe described_class::BatchNotFound do
+    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  end
+
+  describe described_class::BatchClassMissing do
+    it { is_expected.to inherit_from BatchProcessor::BatchError }
+  end
+
   describe described_class::ExistingBatchError do
     it { is_expected.to inherit_from BatchProcessor::BatchError }
   end

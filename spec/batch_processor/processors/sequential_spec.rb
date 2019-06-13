@@ -5,6 +5,12 @@ RSpec.describe BatchProcessor::Processors::Sequential, type: :processor do
 
   it { is_expected.to inherit_from BatchProcessor::ProcessorBase }
 
+  describe ".disable_retries?" do
+    subject { described_class.disable_retries? }
+
+    it { is_expected.to eq true }
+  end
+
   describe "#process_collection_item" do
     include_context "with an example processor batch"
 

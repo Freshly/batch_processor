@@ -19,9 +19,9 @@ RSpec.describe TrafficLightBatch, type: :integration do
 
   it "retries the yellow light" do
     expect { process }.
-      to change { details.total_retries_count }.by(1).
+      to change { details.total_retries_count }.by(0).
       and change { details.successful_jobs_count }.by(1).
-      and change { details.failed_jobs_count }.by(1).
+      and change { details.failed_jobs_count }.by(2).
       and change { details.total_jobs_count }.by(3).
       and change { details.finished_jobs_count }.by(2)
   end

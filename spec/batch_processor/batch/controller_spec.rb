@@ -5,6 +5,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
 
   it { is_expected.to delegate_method(:pipelined).to(:details) }
   it { is_expected.to delegate_method(:allow_empty?).to(:class) }
+  it { is_expected.to delegate_method(:name).to(:class).with_prefix(true) }
 
   describe ".allow_empty" do
     subject(:allow_empty) { example_batch_class.allow_empty }
@@ -47,7 +48,8 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
 
         it "starts processing the batch" do
           expect { start }.
-            to change { example_batch.started? }.from(false).to(true).
+            to change { example_batch.details.class_name }.from(nil).to(example_batch_name).
+            and change { example_batch.started? }.from(false).to(true).
             and change { example_batch.details.started_at }.from(nil).to(Time.current).
             and change { example_batch.details.size }.from(0).to(collection.size).
             and change { example_batch.details.pending_jobs_count }.from(0).to(collection.size)

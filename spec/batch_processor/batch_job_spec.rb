@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.describe BatchProcessor::BatchJob, type: :job do
+  include_context "with an example batch"
+
   subject(:batch_job) { example_class.new(*arguments) }
 
   let(:example_class) do
@@ -65,10 +67,14 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
     end
   end
 
+  shared_context "with the example batch stored in redis" do
+    before do
+      Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "class_name", example_batch_name)
+    end
+  end
+
   describe "#batch" do
     subject { batch_job.batch }
-
-    before { batch_job.batch_id = batch_id }
 
     context "without a batch" do
       let(:batch_id) { nil }
@@ -77,7 +83,11 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
     end
 
     context "with a batch" do
-      it { is_expected.to be_an_instance_of BatchProcessor::BatchBase }
+      include_context "with the example batch stored in redis"
+
+      before { batch_job.batch_id = batch_id }
+
+      it { is_expected.to be_an_instance_of example_batch_class }
       it { is_expected.to have_attributes(batch_id: batch_id) }
     end
   end
@@ -94,6 +104,8 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
     end
 
     context "with a batch" do
+      include_context "with the example batch stored in redis"
+
       it { is_expected.to eq true }
     end
   end
@@ -121,7 +133,7 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
       it_behaves_like "normal without a batch"
 
       context "with a batch" do
-        let(:batch) { BatchProcessor::BatchBase.new(batch_id: batch_id) }
+        include_context "with the example batch stored in redis"
 
         before { batch_job.batch_id = batch_id }
 
@@ -135,7 +147,7 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
           it_behaves_like "job is enqueued"
 
           it "updates the batch" do
-            expect { enqueue }.to change { batch.details.enqueued_jobs_count }.by(1)
+            expect { enqueue }.to change { example_batch.details.enqueued_jobs_count }.by(1)
           end
         end
       end
@@ -147,7 +159,7 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
       it_behaves_like "normal without a batch"
 
       context "with a batch" do
-        let(:batch) { BatchProcessor::BatchBase.new(batch_id: batch_id) }
+        include_context "with the example batch stored in redis"
 
         before { batch_job.batch_id = batch_id }
 
@@ -162,9 +174,9 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
 
           it "updates the batch" do
             expect { enqueue }.
-              to change { batch.details.total_retries_count }.by(1).
-              and change { batch.details.pending_jobs_count }.by(1).
-              and change { batch.details.failed_jobs_count }.by(-1)
+              to change { example_batch.details.total_retries_count }.by(1).
+              and change { example_batch.details.pending_jobs_count }.by(1).
+              and change { example_batch.details.failed_jobs_count }.by(-1)
           end
         end
       end
@@ -185,7 +197,7 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
     end
 
     context "with a batch" do
-      let(:batch) { BatchProcessor::BatchBase.new(batch_id: batch_id) }
+      include_context "with the example batch stored in redis"
 
       before { batch_job.batch_id = batch_id }
 
@@ -199,8 +211,8 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
 
         it "updates the batch" do
           expect { perform_now }.
-            to change { batch.details.canceled_jobs_count }.by(1).
-            and change { batch.details.pending_jobs_count }.by(-1)
+            to change { example_batch.details.canceled_jobs_count }.by(1).
+            and change { example_batch.details.pending_jobs_count }.by(-1)
         end
       end
 
@@ -215,8 +227,8 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
 
           it "updates the batch" do
             expect { perform_now }.
-              to change { batch.details.pending_jobs_count }.by(-1).
-              and change { batch.details.successful_jobs_count }.by(1)
+              to change { example_batch.details.pending_jobs_count }.by(-1).
+              and change { example_batch.details.successful_jobs_count }.by(1)
 
             # The job finishes in this execution, so we need to check the runner was called
             expect(batch_job.batch).to have_received(:job_running)
@@ -242,7 +254,7 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
     end
 
     context "with a batch" do
-      let(:batch) { BatchProcessor::BatchBase.new(batch_id: batch_id) }
+      include_context "with the example batch stored in redis"
 
       before { batch_job.batch_id = batch_id }
 
@@ -257,8 +269,8 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
 
         it "updates the batch" do
           expect { perform_now }.
-            to change { batch.details.pending_jobs_count }.by(-1).
-            and change { batch.details.failed_jobs_count }.by(1)
+            to change { example_batch.details.pending_jobs_count }.by(-1).
+            and change { example_batch.details.failed_jobs_count }.by(1)
 
           # The job fails in this execution, so we need to check the runner was called
           expect(batch_job.batch).to have_received(:job_running)

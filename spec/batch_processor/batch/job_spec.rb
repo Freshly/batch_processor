@@ -42,14 +42,9 @@ RSpec.describe BatchProcessor::Batch::Job, type: :module do
     end
 
     context "without @job_class" do
-      let(:root_name) { Faker::Internet.domain_word.capitalize }
-      let(:example_batch_class_name) { "#{root_name}Batch" }
       let(:example_job_class_name) { "#{root_name}Job" }
 
-      before do
-        stub_const(example_batch_class_name, example_batch_class)
-        stub_const(example_job_class_name, example_job_class)
-      end
+      before { stub_const(example_job_class_name, example_job_class) }
 
       it { is_expected.to eq example_job_class }
     end

@@ -33,6 +33,12 @@ module BatchProcessor
       result
     end
 
+    def retry_job(*)
+      return if batch_job? && batch.processor_class.disable_retries?
+
+      super
+    end
+
     def serialize
       super.merge("batch_id" => batch_id) # rubocop:disable Style/StringHashKeys
     end
@@ -45,7 +51,7 @@ module BatchProcessor
     def batch
       return unless batch_job?
 
-      @batch ||= BatchProcessor::BatchBase.new(batch_id: batch_id)
+      @batch ||= BatchProcessor::BatchBase.find(batch_id)
     end
 
     def batch_job?
