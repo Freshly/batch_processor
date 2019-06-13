@@ -3,7 +3,6 @@
 RSpec.describe TrafficLightBatch, type: :integration do
   subject(:process) { batch.process }
 
-  let(:enqueued_jobs) { ActiveJob::Base.queue_adapter.enqueued_jobs }
   let(:batch) { described_class.new }
   let(:details) { batch.details }
   let(:expected_size) { batch.collection.count }
