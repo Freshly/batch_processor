@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "batch/collection"
 require_relative "batch/job"
 require_relative "batch/processor"
 require_relative "batch/predicates"
@@ -8,10 +7,11 @@ require_relative "batch/controller"
 require_relative "batch/job_controller"
 
 module BatchProcessor
-  class BatchBase < Spicerack::InputModel
+  class BatchBase < Spicerack::InputObject
     option(:batch_id) { SecureRandom.urlsafe_base64(10) }
 
-    include BatchProcessor::Batch::Collection
+    class Collection < BatchProcessor::Collection; end
+
     include BatchProcessor::Batch::Job
     include BatchProcessor::Batch::Processor
     include BatchProcessor::Batch::Predicates
@@ -29,6 +29,13 @@ module BatchProcessor
         batch_class.new(batch_id: batch_id)
       end
     end
+
+    delegate :item_to_job_params, to: :batch_collection
+
+    def collection
+      self.class::Collection.new(**input.except(:batch_id))
+    end
+    memoize :collection
 
     def details
       BatchProcessor::BatchDetails.new(batch_id)
