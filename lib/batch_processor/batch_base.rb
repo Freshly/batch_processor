@@ -10,7 +10,8 @@ module BatchProcessor
   class BatchBase < Spicerack::InputObject
     option(:batch_id) { SecureRandom.urlsafe_base64(10) }
 
-    class Collection < BatchProcessor::Collection; end
+    class BatchCollection < BatchProcessor::Collection; end
+    class Collection < BatchCollection; end
 
     include BatchProcessor::Batch::Job
     include BatchProcessor::Batch::Processor
@@ -30,10 +31,16 @@ module BatchProcessor
       end
     end
 
-    delegate :item_to_job_params, to: :batch_collection
+    def initialize(**input)
+      super(input.slice(*_attributes))
+      @collection_input = input.except(*_attributes)
+    end
+
+    delegate :items, :item_to_job_params, to: :collection, prefix: true
+    memoize :collection_items
 
     def collection
-      self.class::Collection.new(**input.except(:batch_id))
+      self.class::Collection.new(**collection_input)
     end
     memoize :collection
 
@@ -41,5 +48,9 @@ module BatchProcessor
       BatchProcessor::BatchDetails.new(batch_id)
     end
     memoize :details
+
+    private
+
+    attr_reader :collection_input
   end
 end

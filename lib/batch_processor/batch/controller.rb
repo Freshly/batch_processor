@@ -38,10 +38,10 @@ module BatchProcessor
 
       def start
         raise BatchProcessor::BatchAlreadyStartedError if started?
-        raise BatchProcessor::BatchEmptyError if collection.empty? && !allow_empty?
+        raise BatchProcessor::BatchEmptyError if collection_items.empty? && !allow_empty?
 
         run_callbacks(:batch_started) do
-          collection_size = collection.count
+          collection_size = collection_items.count
 
           pipelined do
             details.class_name = class_name

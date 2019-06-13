@@ -18,7 +18,7 @@ RSpec.describe RedGreenBatch, type: :integration do
     let(:batch) { described_class.new(color: color, collection_size: collection_size) }
     let(:collection_size) { nil }
     let(:details) { batch.details }
-    let(:expected_size) { batch.collection.count }
+    let(:expected_size) { batch.collection_items.count }
 
     before { process }
 
