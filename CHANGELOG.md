@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.2
+
+*Release Date*: 6/14/2019
+
+- Exported code so this gem does something
+
 ## v0.2.1
 
 *Release Date*: 6/14/2019
