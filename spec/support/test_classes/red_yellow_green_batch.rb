@@ -6,6 +6,7 @@ class RedYellowGreenBatch < BatchProcessor::BatchBase
 
   on_batch_started :handle_batch_started
   on_batch_enqueued :handle_batch_enqueued
+  on_batch_cleared :handle_batch_cleared
   on_batch_aborted :handle_batch_aborted
   on_batch_finished { Alerter.new.increment(:count_batch_finished) }
 
@@ -34,6 +35,10 @@ class RedYellowGreenBatch < BatchProcessor::BatchBase
 
   def handle_batch_aborted
     Alerter.new.increment(:count_batch_aborted)
+  end
+
+  def handle_batch_cleared
+    Alerter.new.increment(:count_batch_cleared)
   end
 
   def handle_job_failure

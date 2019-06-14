@@ -4,6 +4,7 @@ class Alerter < Spicerack::RedisModel
   field :count_batch_started, :integer, default: 0
   field :count_batch_enqueued, :integer, default: 0
   field :count_batch_aborted, :integer, default: 0
+  field :count_batch_cleared, :integer, default: 0
   field :count_batch_finished, :integer, default: 0
 
   field :count_job_enqueued, :integer, default: 0

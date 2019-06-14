@@ -12,6 +12,7 @@ RSpec.describe BatchProcessor::BatchDetails, type: :batch do
   it { is_expected.to define_field :started_at, :datetime }
   it { is_expected.to define_field :enqueued_at, :datetime }
   it { is_expected.to define_field :aborted_at, :datetime }
+  it { is_expected.to define_field :cleared_at, :datetime }
   it { is_expected.to define_field :finished_at, :datetime }
 
   it { is_expected.to define_field :size, :integer, default: 0 }

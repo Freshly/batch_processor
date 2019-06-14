@@ -10,6 +10,7 @@ module BatchProcessor
     field :started_at, :datetime
     field :enqueued_at, :datetime
     field :aborted_at, :datetime
+    field :cleared_at, :datetime
     field :finished_at, :datetime
 
     field :size, :integer, default: 0

@@ -49,6 +49,10 @@ RSpec.describe BatchProcessor::Batch::Predicates, type: :module do
     it_behaves_like "a date predicate", :aborted?, :aborted_at?
   end
 
+  describe "#aborted?" do
+    it_behaves_like "a date predicate", :cleared?, :cleared_at?
+  end
+
   describe "#finished?" do
     it_behaves_like "a date predicate", :finished?, :finished_at?
   end
