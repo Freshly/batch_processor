@@ -1,21 +1,17 @@
 # frozen_string_literal: true
 
-RSpec.shared_context "with an example batch" do |extra_batch_modules = nil|
-  subject(:example_batch) { example_batch_class.new(**input) }
+RSpec.shared_context "with an example batch" do
+  subject(:example_batch) { example_batch_class.new(batch_id: batch_id, **input) }
 
-  let(:root_batch_modules) do
-    [ ShortCircuIt, Technologic, BatchProcessor::Batch::Callbacks, BatchProcessor::Batch::Core ]
-  end
-  let(:batch_modules) { root_batch_modules + Array.wrap(extra_batch_modules) }
+  let(:example_batch_class) { Class.new(BatchProcessor::BatchBase) }
 
-  let(:root_batch_class) { Class.new }
-  let(:example_batch_class) do
-    root_batch_class.tap do |batch_class|
-      batch_modules.each { |batch_module| batch_class.include batch_module }
-    end
-  end
-
+  let(:batch_id) { SecureRandom.hex }
   let(:input) do
     {}
   end
+
+  let(:root_name) { Faker::Internet.domain_word.capitalize }
+  let(:example_batch_name) { "#{root_name}Batch" }
+
+  before { stub_const(example_batch_name, example_batch_class) }
 end

@@ -1,55 +1,53 @@
 # frozen_string_literal: true
 
 RSpec.describe BatchProcessor::Batch::Core, type: :module do
-  describe "#initialize" do
-    include_context "with example class having callback", :initialize
+  include_context "with an example batch"
 
-    let(:id) { SecureRandom.hex }
-    let(:input) { Hash[*Faker::Lorem.words(4)].symbolize_keys }
-    let(:example_class) { example_class_having_callback.include(described_class) }
+  describe "#batch_id" do
+    before { allow(SecureRandom).to receive(:urlsafe_base64).with(10).and_return(:urlsafe_base64_mock) }
 
-    shared_examples_for "an instance" do
-      it "stores input" do
-        expect(instance.id).to eq id
-        expect(instance.input).to eq input
+    it { is_expected.to define_option :batch_id, default: :urlsafe_base64_mock }
+  end
+
+  describe "#details" do
+    subject(:details) { example_batch.details }
+
+    it { is_expected.to be_an_instance_of BatchProcessor::BatchDetails }
+
+    it "uses #batch_id" do
+      expect(details.batch_id).to eq batch_id
+    end
+  end
+
+  describe ".find" do
+    subject(:find) { example_batch_class.find(batch_id) }
+
+    let(:batch_id) { SecureRandom.hex }
+
+    context "without a class_name" do
+      it "raises" do
+        expect { find }.to raise_error BatchProcessor::NotFoundError, "A Batch with id #{batch_id} was not found."
       end
     end
 
-    context "with no arguments" do
-      subject(:instance) { example_class.new }
+    context "with a class_name" do
+      let(:redis_key) { BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id) }
+      let(:class_name) { Faker::Internet.domain_word.capitalize }
 
-      let(:id) { nil }
-      let(:input) { {} }
+      before { Redis.new.hset(redis_key, "class_name", class_name) }
 
-      it_behaves_like "an instance"
-    end
+      context "when invalid" do
+        it "raises" do
+          expect { find }.to raise_error BatchProcessor::ClassMissingError, "#{class_name} is not a class"
+        end
+      end
 
-    context "with only an id" do
-      subject(:instance) { example_class.new(id) }
+      context "when valid" do
+        let(:class_name) { example_batch_name }
 
-      let(:input) { {} }
-
-      it_behaves_like "an instance"
-    end
-
-    context "with only input" do
-      subject(:instance) { example_class.new(**input) }
-
-      let(:id) { nil }
-
-      it_behaves_like "an instance"
-    end
-
-    context "with id and input" do
-      subject(:instance) { example_class.new(id, **input) }
-
-      it_behaves_like "an instance"
-    end
-
-    it_behaves_like "a class with callback" do
-      subject(:callback_runner) { example_class.new }
-
-      let(:example) { example_class }
+        it { is_expected.to be_an_instance_of example_batch_class }
+        it { is_expected.to have_attributes(batch_id: batch_id) }
+      end
     end
   end
 end
