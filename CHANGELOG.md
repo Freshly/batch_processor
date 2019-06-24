@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.3
+
+*Release Date*: 6/24/2019
+
+- Fixed an inheritance issue with allow_empty
+
 ## v0.2.2
 
 *Release Date*: 6/14/2019
