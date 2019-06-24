@@ -3,7 +3,7 @@
 RSpec.describe RedGreenBatch, type: :batch do
   subject { described_class }
 
-  it { is_expected.to inherit_from BatchProcessor::BatchBase }
+  it { is_expected.to inherit_from InheritedEmptyBatch }
   it { is_expected.to use_default_job_class }
   it { is_expected.to use_parallel_processor }
   it { is_expected.to be_allow_empty }

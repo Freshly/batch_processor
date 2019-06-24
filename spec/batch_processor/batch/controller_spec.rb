@@ -8,7 +8,7 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
   it { is_expected.to delegate_method(:name).to(:class).with_prefix(true) }
 
   describe ".allow_empty" do
-    subject(:allow_empty) { example_batch_class.allow_empty }
+    subject(:allow_empty) { example_batch_class.__send__(:allow_empty) }
 
     it "sets @allow_empty" do
       expect { allow_empty }.to change { example_batch_class.instance_variable_get(:@allow_empty) }.from(nil).to(true)

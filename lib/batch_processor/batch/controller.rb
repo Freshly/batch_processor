@@ -15,12 +15,19 @@ module BatchProcessor
       end
 
       class_methods do
-        def allow_empty
-          @allow_empty = true
+        def inherited(base)
+          base.allow_empty if allow_empty?
+          super
         end
 
         def allow_empty?
           @allow_empty.present?
+        end
+
+        protected
+
+        def allow_empty
+          @allow_empty = true
         end
 
         private

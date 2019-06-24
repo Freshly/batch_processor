@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    batch_processor (0.2.2)
+    batch_processor (0.2.3)
       activejob (~> 5.2.1)
       activesupport (~> 5.2.1)
       redis (>= 3.0)
