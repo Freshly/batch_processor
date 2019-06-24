@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-class RedGreenBatch < BatchProcessor::BatchBase
-  allow_empty
+class RedGreenBatch < InheritedEmptyBatch
   with_parallel_processor
 
   class Collection < BatchCollection
