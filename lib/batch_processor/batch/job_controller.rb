@@ -10,11 +10,7 @@ module BatchProcessor
         private
 
         def job_callbacks(*events)
-          job_events = events.map { |event| "job_#{event}".to_sym }
-
-          define_callbacks_with_handler(*job_events)
-
-          job_events.each do |job_event|
+          define_callbacks_for(*events, :job).each do |job_event|
             set_callback job_event, :around, ->(_, block) { surveil(job_event, batch_id: batch_id) { block.call } }
           end
         end
