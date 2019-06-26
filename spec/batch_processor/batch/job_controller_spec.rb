@@ -28,7 +28,13 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
         let(:example_class) { example.class }
       end
 
-      it_behaves_like "a surveiled event", :job_enqueued do
+      it_behaves_like "an info event is logged", :job_enqueued do
+        let(:expected_class) { example_batch_class.name }
+
+        before { job_enqueued }
+      end
+
+      it_behaves_like "a event", :job_enqueued do
         let(:expected_class) { example_batch_class.name }
 
         before { job_enqueued }

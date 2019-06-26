@@ -15,7 +15,7 @@ module BatchProcessor
           define_callbacks_with_handler(*job_events)
 
           job_events.each do |job_event|
-            set_callback job_event, :around, ->(_, block) { surveil(job_event) { block.call } }
+            set_callback job_event, :around, ->(_, block) { info(job_event, batch_id: batch_id) { block.call } }
           end
         end
       end

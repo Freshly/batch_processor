@@ -20,6 +20,7 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
   before { stub_const(example_class_name, example_class) }
 
   it { is_expected.to inherit_from ActiveJob::Base }
+  it { is_expected.to include_module Technologic }
 
   describe described_class::BatchAbortedError do
     subject { described_class }
@@ -320,6 +321,17 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
 
           # The job fails in this execution, so we need to check the runner was called
           expect(batch_job.batch).to have_received(:job_running)
+        end
+
+        it_behaves_like "an error event is logged", :batch_job_failed do
+          let(:expected_class) { example_class }
+
+          before do
+            perform_now
+          rescue StandardError # rubocop:disable Lint/HandleExceptions
+          end
+
+          let(:expected_data) { Hash[:exception, instance_of(StandardError)] }
         end
       end
     end
