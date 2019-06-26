@@ -331,7 +331,9 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
           rescue StandardError # rubocop:disable Lint/HandleExceptions
           end
 
-          let(:expected_data) { Hash[:exception, instance_of(StandardError)] }
+          let(:expected_data) do
+            { exception: instance_of(StandardError), job_id: instance_of(String) }
+          end
         end
       end
     end

@@ -29,7 +29,7 @@ module BatchProcessor
       batch.job_canceled and return exception if exception.is_a?(BatchAbortedError)
 
       if batch_job?
-        error :batch_job_failed, exception: exception
+        error :batch_job_failed, exception: exception, job_id: job_id
         batch.job_failure
       end
 

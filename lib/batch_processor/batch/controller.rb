@@ -38,7 +38,7 @@ module BatchProcessor
           define_callbacks_with_handler(*batch_events)
 
           batch_events.each do |batch_event|
-            set_callback batch_event, :around, ->(_, block) { surveil(batch_event) { block.call } }
+            set_callback batch_event, :around, ->(_, block) { surveil(batch_event, batch_id: batch_id) { block.call } }
           end
         end
       end
