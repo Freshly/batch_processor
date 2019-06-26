@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.5
+
+*Release Date*: 6/26/2019
+
+- Fixed a deserialize issue
+
 ## v0.2.4
 
 *Release Date*: 6/26/2019

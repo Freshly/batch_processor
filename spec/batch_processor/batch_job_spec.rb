@@ -287,7 +287,7 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
     end
   end
 
-  describe ".discard_on StandardError" do
+  describe ".failure on perform" do
     subject(:perform_now) { batch_job.perform_now }
 
     let(:reason) { Faker::Lorem.sentence }
@@ -317,6 +317,60 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
           expect { perform_now }.
             to raise_error(StandardError, reason).
             and change { example_batch.details.pending_jobs_count }.by(-1).
+            and change { example_batch.details.running_jobs_count }.by(0).
+            and change { example_batch.details.failed_jobs_count }.by(1)
+
+          # The job fails in this execution, so we need to check the runner was called
+          expect(batch_job.batch).to have_received(:job_running)
+        end
+
+        it_behaves_like "an error event is logged", :batch_job_failed do
+          let(:expected_class) { example_class }
+
+          before do
+            perform_now
+          rescue StandardError # rubocop:disable Lint/HandleExceptions
+          end
+
+          let(:expected_data) do
+            { exception: instance_of(StandardError), job_id: instance_of(String) }
+          end
+        end
+      end
+    end
+  end
+
+  describe ".failure on deserialize" do
+    subject(:perform_now) { batch_job.perform_now }
+
+    let(:reason) { Faker::Lorem.sentence }
+
+    before { allow(batch_job).to receive(:deserialize_arguments_if_needed).and_raise StandardError, reason }
+
+    context "without a batch" do
+      let(:batch_id) { nil }
+
+      it "raises" do
+        expect { perform_now }.to raise_error StandardError, reason
+      end
+    end
+
+    context "with a batch" do
+      include_context "with the example batch stored in redis"
+
+      before { batch_job.batch_id = batch_id }
+
+      context "when started" do
+        before do
+          Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "started_at", Time.now)
+          allow(batch_job.batch).to receive(:job_running).and_call_original
+        end
+
+        it "updates the batch" do
+          expect { perform_now }.
+            to raise_error(StandardError, reason).
+            and change { example_batch.details.pending_jobs_count }.by(-1).
+            and change { example_batch.details.running_jobs_count }.by(0).
             and change { example_batch.details.failed_jobs_count }.by(1)
 
           # The job fails in this execution, so we need to check the runner was called
