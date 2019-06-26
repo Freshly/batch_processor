@@ -3,7 +3,7 @@
 # A batch can only be processed by a batchable job.
 module BatchProcessor
   class BatchJob < ActiveJob::Base
-    attr_accessor :batch_id
+    attr_accessor :batch_id, :tracked_batch_running
 
     include Technologic
 
@@ -20,6 +20,8 @@ module BatchProcessor
     before_perform(if: :batch_job?) do
       raise BatchAbortedError if batch.aborted?
 
+      self.tracked_batch_running = true
+
       batch.job_running
     end
 
@@ -30,6 +32,7 @@ module BatchProcessor
 
       if batch_job?
         error :batch_job_failed, exception: exception, job_id: job_id
+        batch.job_running unless tracked_batch_running
         batch.job_failure
       end
 
