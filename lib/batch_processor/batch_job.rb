@@ -31,7 +31,6 @@ module BatchProcessor
       batch.job_canceled and return exception if exception.is_a?(BatchAbortedError)
 
       if batch_job?
-        error :batch_job_failed, exception: exception, job_id: job_id
         batch.job_running unless tracked_batch_running
         batch.job_failure
       end

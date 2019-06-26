@@ -323,19 +323,6 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
           # The job fails in this execution, so we need to check the runner was called
           expect(batch_job.batch).to have_received(:job_running)
         end
-
-        it_behaves_like "an error event is logged", :batch_job_failed do
-          let(:expected_class) { example_class }
-
-          before do
-            perform_now
-          rescue StandardError # rubocop:disable Lint/HandleExceptions
-          end
-
-          let(:expected_data) do
-            { exception: instance_of(StandardError), job_id: instance_of(String) }
-          end
-        end
       end
     end
   end
@@ -375,19 +362,6 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
 
           # The job fails in this execution, so we need to check the runner was called
           expect(batch_job.batch).to have_received(:job_running)
-        end
-
-        it_behaves_like "an error event is logged", :batch_job_failed do
-          let(:expected_class) { example_class }
-
-          before do
-            perform_now
-          rescue StandardError # rubocop:disable Lint/HandleExceptions
-          end
-
-          let(:expected_data) do
-            { exception: instance_of(StandardError), job_id: instance_of(String) }
-          end
         end
       end
     end
