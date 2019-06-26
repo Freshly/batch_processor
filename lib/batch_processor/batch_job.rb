@@ -5,6 +5,8 @@ module BatchProcessor
   class BatchJob < ActiveJob::Base
     attr_accessor :batch_id
 
+    include Technologic
+
     class BatchAbortedError < StandardError; end
 
     after_enqueue(if: :batch_job?) do |job|
@@ -26,7 +28,10 @@ module BatchProcessor
     def rescue_with_handler(exception)
       batch.job_canceled and return exception if exception.is_a?(BatchAbortedError)
 
-      batch.job_failure if batch_job?
+      if batch_job?
+        error :batch_job_failed, exception: exception, job_id: job_id
+        batch.job_failure
+      end
 
       super
     end

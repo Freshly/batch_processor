@@ -42,6 +42,14 @@ module BatchProcessor
 
           batch_class.new(batch_id: batch_id)
         end
+
+        private
+
+        def define_callbacks_for(*events, type)
+          callbacks = events.map { |event| "#{type}_#{event}".to_sym }
+          define_callbacks_with_handler(*callbacks)
+          callbacks
+        end
       end
     end
   end

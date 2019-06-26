@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.4
+
+*Release Date*: 6/26/2019
+
+- Improved logging
+
 ## v0.2.3
 
 *Release Date*: 6/24/2019

@@ -31,6 +31,10 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
       it_behaves_like "a surveiled event", :job_enqueued do
         let(:expected_class) { example_batch_class.name }
 
+        let(:expected_data) do
+          { batch_id: batch_id }
+        end
+
         before { job_enqueued }
       end
     end
@@ -65,6 +69,10 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
 
       it_behaves_like "a surveiled event", :job_running do
         let(:expected_class) { example_batch_class.name }
+
+        let(:expected_data) do
+          { batch_id: batch_id }
+        end
 
         before { job_running }
       end
@@ -116,6 +124,10 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
         it_behaves_like "a surveiled event", :job_success do
           let(:expected_class) { example_batch_class.name }
 
+          let(:expected_data) do
+            { batch_id: batch_id }
+          end
+
           before { job_success }
         end
       end
@@ -165,6 +177,10 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
         it_behaves_like "a surveiled event", :job_failure do
           let(:expected_class) { example_batch_class.name }
 
+          let(:expected_data) do
+            { batch_id: batch_id }
+          end
+
           before { job_failure }
         end
       end
@@ -201,6 +217,10 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
 
       it_behaves_like "a surveiled event", :job_retried do
         let(:expected_class) { example_batch_class.name }
+
+        let(:expected_data) do
+          { batch_id: batch_id }
+        end
 
         before { job_retried }
       end
@@ -240,6 +260,10 @@ RSpec.describe BatchProcessor::Batch::JobController, type: :module do
 
       it_behaves_like "a surveiled event", :job_canceled do
         let(:expected_class) { example_batch_class.name }
+
+        let(:expected_data) do
+          { batch_id: batch_id }
+        end
 
         before { job_canceled }
       end
