@@ -79,6 +79,10 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
         it_behaves_like "a surveiled event", :batch_started do
           let(:expected_class) { example_batch_class.name }
 
+          let(:expected_data) do
+            { batch_id: batch_id }
+          end
+
           before { start }
         end
       end
@@ -141,6 +145,10 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
       it_behaves_like "a surveiled event", :batch_enqueued do
         let(:expected_class) { example_batch_class.name }
 
+        let(:expected_data) do
+          { batch_id: batch_id }
+        end
+
         before { enqueued }
       end
     end
@@ -194,6 +202,10 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
 
         it_behaves_like "a surveiled event", :batch_aborted do
           let(:expected_class) { example_batch_class.name }
+
+          let(:expected_data) do
+            { batch_id: batch_id }
+          end
 
           before { abort! }
         end
@@ -263,6 +275,10 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
         it_behaves_like "a surveiled event", :batch_cleared do
           let(:expected_class) { example_batch_class.name }
 
+          let(:expected_data) do
+            { batch_id: batch_id }
+          end
+
           before { clear! }
         end
       end
@@ -311,6 +327,10 @@ RSpec.describe BatchProcessor::Batch::Controller, type: :module do
 
         it_behaves_like "a surveiled event", :batch_finished do
           let(:expected_class) { example_batch_class.name }
+
+          let(:expected_data) do
+            { batch_id: batch_id }
+          end
 
           before { finish }
         end
