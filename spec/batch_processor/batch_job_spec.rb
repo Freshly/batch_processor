@@ -70,7 +70,13 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
 
   shared_context "with the example batch stored in redis" do
     before do
-      Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "class_name", example_batch_name)
+      redis = Redis.new
+      key = BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id)
+
+      redis.pipelined do
+        redis.hset(key, "class_name", example_batch_name)
+        redis.hset(key, "pending_jobs_count", 10)
+      end
     end
   end
 
@@ -384,6 +390,56 @@ RSpec.describe BatchProcessor::BatchJob, type: :job do
             perform_now
           rescue StandardError # rubocop:disable Lint/HandleExceptions
           end
+
+          let(:expected_data) do
+            { exception: instance_of(StandardError), job_id: instance_of(String) }
+          end
+        end
+      end
+    end
+  end
+
+  describe ".failure twice" do
+    # Contrived sure, but it's unclear what actually causes this, so this is the best I could think of to simulate it.
+    subject(:rescue_with_handler_twice) do
+      batch_job.rescue_with_handler(exception)
+      batch_job.rescue_with_handler(exception)
+    end
+
+    let(:exception) { StandardError.new(reason) }
+    let(:reason) { Faker::Lorem.sentence }
+
+    context "without a batch" do
+      let(:batch_id) { nil }
+
+      it { is_expected.to be_nil }
+    end
+
+    context "with a batch" do
+      include_context "with the example batch stored in redis"
+
+      before { batch_job.batch_id = batch_id }
+
+      context "when started" do
+        before do
+          Redis.new.hset(BatchProcessor::BatchDetails.redis_key_for_batch_id(batch_id), "started_at", Time.now)
+          allow(batch_job.batch).to receive(:job_running).and_call_original
+        end
+
+        it "updates the batch" do
+          expect { rescue_with_handler_twice }.
+            to change { example_batch.details.pending_jobs_count }.by(-1).
+            and change { example_batch.details.running_jobs_count }.by(0).
+            and change { example_batch.details.failed_jobs_count }.by(1)
+
+          # The job fails in this execution, so we need to check the runner was called
+          expect(batch_job.batch).to have_received(:job_running)
+        end
+
+        it_behaves_like "an error event is logged", :batch_job_failed do
+          let(:expected_class) { example_class }
+
+          before { rescue_with_handler_twice }
 
           let(:expected_data) do
             { exception: instance_of(StandardError), job_id: instance_of(String) }

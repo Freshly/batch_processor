@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.6
+
+*Release Date*: 6/27/2019
+
+- Fixed an issue where failure was tracked twice (something something async deadlocks)
+
 ## v0.2.5
 
 *Release Date*: 6/26/2019
