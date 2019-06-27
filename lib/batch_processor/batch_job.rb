@@ -3,7 +3,7 @@
 # A batch can only be processed by a batchable job.
 module BatchProcessor
   class BatchJob < ActiveJob::Base
-    attr_accessor :batch_id, :tracked_batch_running
+    attr_accessor :batch_id, :tracked_batch_running, :tracked_batch_failure
 
     include Technologic
 
@@ -27,10 +27,15 @@ module BatchProcessor
 
     after_perform(if: :batch_job?) { batch.job_success }
 
+    # Some combination of Sidekiq + ActiveJob + Postgres + Deadlocks = this getting called twice for the same instance.
+    # It is unclear WHY that situation happens, but during the second execution, the instance no longer has it's job_id
+    # but somehow still has a batch ID. It seems regardless, an internal semaphore seems to prevent miscounting in that
+    # situation. I'd love to know what the root cause is behind it, but async debugging is time consuming and hard. :(
     def rescue_with_handler(exception)
       batch.job_canceled and return exception if exception.is_a?(BatchAbortedError)
 
-      batch_job_failure(exception) if batch_job?
+      batch_job_failure(exception) if batch_job? && !tracked_batch_failure
+      self.tracked_batch_failure = true
 
       super
     end
