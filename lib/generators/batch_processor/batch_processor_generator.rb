@@ -9,7 +9,7 @@ module BatchProcessor
       hook_for :test_framework
 
       def create_application_flow
-        template "batch_processor.rb.erb", File.join("app/batches/", class_path, "#{file_name}_batch.rb")
+        template "batch.rb.erb", File.join("app/batches/", class_path, "#{file_name}_batch.rb")
       end
     end
   end
