@@ -1,0 +1,29 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe <%= class_name %>Batch, type: :batch do
+  subject { described_class }
+
+  it { is_expected.to inherit_from BatchProcessor::BatchBase }
+
+  # it { is_expected.to use_sequential_processor }
+  # it { is_expected.to use_parallel_processor }
+
+  # it { is_expected.to be_allow_empty }
+
+  # it { is_expected.to use_default_job_class }
+  # it { is_expected.to use_job_class OtherJob }
+
+  # it { is_expected.to set_processor_option :continue_after_exception, true }
+  # it { is_expected.to set_processor_option :sorted, true }
+  # it { is_expected.not_to be_allow_empty }
+
+  describe <%= class_name %>Batch::Collection, type: :batch_collection do
+    subject { described_class.new(arg: :argument) }
+
+    it { is_expected.to inherit_from BatchProcessor::BatchBase::BatchCollection }
+    # it { is_expected.to define_argument :arg, allow_nil: false }
+    # it { is_expected.to define_option :opt, default: 3 }
+  end
+end
