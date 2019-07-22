@@ -6,9 +6,6 @@ module BatchProcessor
       source_root File.expand_path("templates", __dir__)
 
       hook_for :test_framework
-      hook_for :job do |instance, job|
-        instance.invoke job, [ instance.name ]
-      end
 
       def create_application_flow
         template "batch.rb.erb", File.join("app/batches/", class_path, "#{file_name}_batch.rb")
