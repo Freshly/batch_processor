@@ -14,7 +14,6 @@ Define your collection, job, and callbacks all in one clear and concise object
    * [Contributing](#contributing)
    * [License](#license)
 
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -31,19 +30,50 @@ Or install it yourself as:
 
     $ gem install batch_processor
 
-## Usage
+## Getting Started
 
-TODO: Write usage instructions here
+BatchProcessor comes with some nice rails generators. You are encouraged to use them!
 
-## Development
+```bash
+$ rails g batch_processor foo
+  invoke  rspec
+  create    spec/batches/foo_batch_spec.rb
+  create  app/batches/foo_batch.rb
+```
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+## What is BatchProcessor?
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+BatchProcessor allows you to process a collection either sequentially or in parallel using `ActiveJob`.
+
+## How It Works
+
+![sequential](docs/images/sequential-processor.png)
+
+![parallel](docs/images/parallel-processor.png)
+
+There are three important concepts to distinguish here: [Batches](#Batches), [Processors](#Processors), and [Jobs](#Jobs).
+
+### Batches
+
+TODO
+
+### Processors
+
+TODO
+
+### Jobs
+
+TODO
 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/Freshly/batch_processor.
+
+### Development
+
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+
+To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## License
 
