@@ -1,0 +1,8 @@
+Description:
+    Stub a Batch test.
+
+Example:
+    `rails generate rspec:batch_processor foo`
+
+    Generates:
+      Test: spec/batches/foo_batch_spec.rb

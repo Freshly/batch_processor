@@ -1,0 +1,21 @@
+# frozen_string_literal: true
+
+class <%= class_name %>Batch < ApplicationBatch
+  # with_parallel_processor
+  # with_sequential_processor
+  # processor_option :continue_after_exception, true
+  # processor_option :sorted, true
+
+  # process_with_job OtherJob
+
+  # allow_empty
+
+  class Collection < BatchCollection
+    # argument :arg, allow_nil: false
+    # option :opt, default: 3
+
+    def items
+      # TODO
+    end
+  end
+end
