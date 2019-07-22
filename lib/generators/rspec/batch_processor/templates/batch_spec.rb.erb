@@ -20,7 +20,7 @@ RSpec.describe <%= class_name %>Batch, type: :batch do
   # it { is_expected.not_to be_allow_empty }
 
   describe <%= class_name %>Batch::Collection, type: :batch_collection do
-    subject { described_class.new(arg: :argument) }
+    subject { described_class.new }
 
     it { is_expected.to inherit_from BatchProcessor::BatchBase::BatchCollection }
     # it { is_expected.to define_argument :arg, allow_nil: false }
