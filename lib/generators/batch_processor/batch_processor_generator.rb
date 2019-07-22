@@ -3,8 +3,6 @@
 module BatchProcessor
   module Generators
     class BatchProcessorGenerator < Rails::Generators::NamedBase
-      class_option :job, type: :boolean, default: true
-
       source_root File.expand_path("templates", __dir__)
 
       hook_for :job
