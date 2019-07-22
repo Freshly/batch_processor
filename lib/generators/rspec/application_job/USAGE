@@ -1,0 +1,9 @@
+Description:
+    Create ApplicationJob test.
+
+Example:
+    `rails generate rspec:application_job`
+
+    Generates:
+      Test: spec/jobs/application_job_spec.rb
+
