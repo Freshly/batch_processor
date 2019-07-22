@@ -1,0 +1,9 @@
+Description:
+    Create ApplicationBatch test.
+
+Example:
+    `rails generate rspec:application_batch`
+
+    Generates:
+      Test: spec/batches/application_batch_spec.rb
+
