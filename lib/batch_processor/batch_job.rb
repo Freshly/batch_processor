@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
-# A batch can only be processed by a batchable job.
+# Only a **BatchJob** can be used to perform work, but it can be run outside of a batch as well.
+# Therefore, the recommendation is to make `ApplicationJob` inherit from `BatchJob`.
 module BatchProcessor
+  # BatchProcessor depends on ActiveJob for handling the processing of individual items in a collection.
   class BatchJob < ActiveJob::Base
     attr_accessor :batch_id, :tracked_batch_running, :tracked_batch_failure
 

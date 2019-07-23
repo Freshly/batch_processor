@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Predicates allow inspection of the status of a batch.
+# The **Status** of a batch is manifested by a collection of predicates which track certain lifecycle events.
 module BatchProcessor
   module Batch
     module Predicates

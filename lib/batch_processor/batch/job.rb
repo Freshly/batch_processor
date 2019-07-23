@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# A batch job is what process each item in the collection.
+# Unless otherwise specified a `Batch` assumes its **Job** class shares a common name.
 module BatchProcessor
   module Batch
     module Job
