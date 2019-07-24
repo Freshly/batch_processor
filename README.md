@@ -124,11 +124,122 @@ PodSprintCalculationBatch.process(batch_id: batch_id, sprint: Sprint.last)
 
 ##### Input
 
-TODO
+A collection accepts input represented by arguments and options which initialize it.
+
+Arguments describe input required to define the initial state.
+
+If any arguments are missing, an ArgumentError is raised.
+
+
+```ruby
+class ExampleJob < BatchProcessor::BatchJob
+  def perform(arg)
+    "OK #{arg}"
+  end
+end
+
+class ExampleBatch < ApplicationBatch
+  class Collection < BatchCollection
+    argument :foo
+    argument :bar
+    
+    def items
+      [ foo, bar ]
+    end
+  end
+end
+
+ExampleBatch.process # => ArgumentError (Missing arguments: foo, bar)
+ExampleBatch.process(foo: "foo") # => ArgumentError (Missing argument: bar)
+ExampleBatch.process(foo: "foo", bar: "bar") # => #<ExampleBatch batch_id="XPf--GzdbRLyww">
+```
+
+By default, nil is a valid argument:
+
+```ruby
+ExampleBatch.process(foo: nil, bar: nil) # => #<ExampleBatch batch_id="f-GzXP-dbn3yxw">
+```
+
+If you want to require a non-nil value for your argument, set the allow_nil option (true by default):
+
+```ruby
+class ExampleBatch < ApplicationBatch
+  class Collection < BatchCollection
+    argument :foo
+    argument :bar, allow_nil: false
+    
+    def items
+      [ foo, bar ]
+    end
+  end
+end
+
+ExampleBatch.process(foo: nil, bar: nil) # => ArgumentError (Missing argument: bar)
+```
+
+Options describe input which may be provided to define or override the initial state.
+
+Options can optionally define a default value.
+
+If no default is specified, the value will be nil.
+
+If the default value is static, it can be specified in the class definition.
+
+If the default value is dynamic, you may provide a block to compute the default value.
+
+⚠️‍ Heads Up: The default value blocks DO NOT provide access to the state or its other variables!
+
+```ruby
+class ExampleBatch < ApplicationBatch
+  class Collection < BatchCollection
+    option :attribution_source
+    option :favorite_foods, default: %w[pizza ice_cream gluten]
+    option(:favorite_color) { SecureRandom.hex(3) }
+    
+    def items
+      [ attribution_source, favorite_foods, favorite_color ]
+    end
+  end
+end
+
+batch = ExampleBatch.process(favorite_foods: %w[avocado hummus nutritional_yeast])
+collection = batch.collection
+
+collection.attribution_source # => nil
+collection.favorite_color # => "1a1f1e"
+collection.favorite_foods # => ["avocado", "hummus" ,"nutritional_yeast"]
+```
 
 ##### Validations
 
-TODO
+Collections are `ActiveModels` which means they have access to [ActiveModel::Validations](https://api.rubyonrails.org/classes/ActiveModel/Validations.html).
+
+It is considered a best practice to write validations in your collections.
+
+Batches which have an invalid collection will NOT start and therefore will not process any Jobs, so it is inherently the safest and clearest way to proactively communicate about missed expectations.
+
+💁‍ Pro Tip: There is a `process!` method on Batches that will raise any errors (which are normally silenced). Invalid states are one such example!
+
+```ruby
+class ExampleBatch < ApplicationBatch
+  class Collection < BatchCollection
+    argument :first_name
+  
+    validates :first_name, length: { minimum: 2 }
+    
+    def items
+      [ first_name ]
+    end
+  end
+end
+
+ExampleBatch.process!(first_name: "a") # => raises BatchProcessor::CollectionInvalidError
+
+batch = ExampleBatch.process(first_name: "a")
+batch.started? # => false
+batch.collection_valid? # => false
+batch.collection.errors.messages # => {:first_name=>["is too short (minimum is 2 characters)"]}
+```
 
 #### ActiveJob
 

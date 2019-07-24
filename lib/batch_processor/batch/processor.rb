@@ -31,6 +31,10 @@ module BatchProcessor
           new(*arguments).process
         end
 
+        def process!(*arguments)
+          new(*arguments).process!
+        end
+
         def processor_class
           return @processor_class if defined?(@processor_class)
 
@@ -51,8 +55,16 @@ module BatchProcessor
         end
       end
 
-      def process
+      def process!
         processor_class.execute(batch: self, **_processor_options)
+        self
+      end
+
+      def process
+        process!
+      rescue StandardError => exception
+        error :process_error, exception: exception
+        self
       end
     end
   end

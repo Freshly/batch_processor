@@ -10,6 +10,8 @@ module BatchProcessor
         date_predicate :started, :enqueued, :aborted, :cleared, :finished
 
         job_count_predicate :enqueued, :pending, :running, :failed, :canceled, :unfinished, :finished
+
+        delegate :valid?, to: :collection, prefix: true
       end
 
       def processing?
