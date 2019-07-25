@@ -79,9 +79,9 @@ BatchProcessor helps monitor, control, and orchestrate the work done by `ActiveJ
 
 ## How It Works
 
-TODO: Batch Lifecycle / Workflow Diagram
+![BatchProcessor](docs/images/batch_processor.png)
 
-There are three important concepts to distinguish here: [Batches](#Batches), [Processors](#Processors), and [Jobs](#Jobs).
+There are three key concepts to distinguish here: [Batches](#Batches), [Processors](#Processors), and [Jobs](#Jobs).
 
 ### Batches
 
