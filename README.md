@@ -16,14 +16,15 @@ Define your collection, job, and callbacks all in one clear and concise object
          * [Input](#input)
          * [Validations](#validations)
       * [ActiveJob](#activejob)
+      * [Aborting](#aborting)
+         * [Clearing](#clearing)
       * [Details](#details)
       * [Status](#status)
       * [Callbacks](#callbacks)
    * [Processors](#processors)
       * [Parallel Processor](#parallel-processor)
-         * [Processor Options](#processor-options)
       * [Sequential Processor](#sequential-processor)
-         * [Processor Options](#processor-options-1)
+         * [Processor Options](#processor-options)
    * [Jobs](#jobs)
       * [Handling Errors](#handling-errors)
 * [Testing](#testing)
@@ -241,6 +242,14 @@ batch.collection_valid? # => false
 batch.collection.errors.messages # => {:first_name=>["is too short (minimum is 2 characters)"]}
 ```
 
+#### Aborting
+
+TODO
+
+##### Clearing
+
+TODO
+
 #### ActiveJob
 
 When `.process` is called on a Batch, `.execute` is called on the `Processor` specified in the Batch's definition.
@@ -261,7 +270,55 @@ end
 
 The **Details** of a batch are the times of critical lifecycle events and the summary counts of processed jobs.
 
-TODO: List of Details
+```ruby
+batch = ExampleBatch.process
+details = batch.details
+
+details.started_at # => 2019-07-25 12:13:44 UTC
+details.size # => 1
+details.pending_jobs_count # => 1
+details.to_h # => {"class_name"=>"ExampleBatch", "started_at"=>"2019-07-25 08:13:44 -0400", "size"=>"1", "pending_jobs_count"=>"1"}
+```
+
+The details object is built with [RedisHash](https://github.com/Freshly/spicerack/tree/master/redis_hash) which works just like a plain old ruby Hash which makes calls to fetch data automatically.
+
+⚠️ **Warning**: This hash is **NOT** cached so each method call makes a `Redis` call! `#FeatureNotABug`
+
+```ruby
+batch = ExampleBatch.process
+details = batch.details
+
+details.pending_jobs_count # => 3
+
+# rake resque:work in another window...
+
+details.pending_jobs_count # => 2
+details.pending_jobs_count # => 1
+```
+
+##### Methods
+
+| Name                    | Type       | Description                                |
+| ----------------------- | ---------- | ------------------------------------------ |
+| `batch_id`              | `String`   | The unique ID of the batch's instance.     |
+| `class_name`            | `String`   | The name of the batch's class.             |
+| `started_at`            | `DateTime` | When processing began on the batch.        |
+| `enqueued_at`           | `DateTime` | `[Parallel]` When all jobs were enqueued.  |
+| `aborted_at`            | `DateTime` | When `#abort!` was called on the batch.    |
+| `cleared_at`            | `DateTime` | When `#clear!` was called on the batch.    |
+| `finished_at`           | `DateTime` | When processing finished on the batch.     |
+| `size`                  | `Number`   | Count of items in the batch's collection.  |
+| `enqueued_jobs_count`   | `Number`   | `[Parallel]` Count of the jobs enqueued.   |
+| `pending_jobs_count`    | `Number`   | Count of jobs waiting to be performed.     |
+| `running_jobs_count`    | `Number`   | Count of jobs currently being performed.   |
+| `successful_jobs_count` | `Number`   | Count of jobs performed successfully.      |
+| `failed_jobs_count`     | `Number`   | Count of jobs which raised errors.         |
+| `canceled_jobs_count`   | `Number`   | Count of jobs NOT performed from `abort`.  |
+| `cleared_jobs_count`    | `Number`   | Count of missing jobs flushed by `clear`.  |
+| `total_retries_count`   | `Number`   | Total count of retry attempts by all jobs. |
+| `unfinished_jobs_count` | `Number`   | Current count of jobs pending and running. |
+| `finished_jobs_count`   | `Number`   | Current count of jobs already performed.   |
+| `total_jobs_count`      | `Number`   | Count of jobs (which should equal `size`). |
 
 #### Status
 
@@ -321,10 +378,6 @@ BatchProcessor comes with two standard processors: **Parallel** and **Sequential
 ![parallel](docs/images/parallel-processor.png)
 
 The Parallel Processor enqueues jobs to be performed later.
-
-##### Processor Options
-
-None
 
 #### Sequential Processor
 
