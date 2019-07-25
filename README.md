@@ -16,11 +16,15 @@ Define your collection, job, and callbacks all in one clear and concise object
          * [Input](#input)
          * [Validations](#validations)
       * [ActiveJob](#activejob)
+         * [Retries](#retries)
       * [Aborting](#aborting)
          * [Clearing](#clearing)
       * [Details](#details)
+         * [Detail Methods](#detail-methods)
       * [Status](#status)
+         * [Status Methods](#status-methods)
       * [Callbacks](#callbacks)
+         * [Callback Methods](#callback-methods)
    * [Processors](#processors)
       * [Parallel Processor](#parallel-processor)
       * [Sequential Processor](#sequential-processor)
@@ -123,6 +127,31 @@ batch_id = SecureRandom.hex
 PodSprintCalculationBatch.process(batch_id: batch_id, sprint: Sprint.last)
 ```
 
+You can supply any unique value you want for a `batch_id`:
+
+```ruby
+attempt_number = 1
+current_date = Date.today
+batch_id = "daily-charge-batch:#{current_date}:#{attempt_number}"
+
+ChargeBatch.process(batch_id: batch_id, date: current_date)
+```
+
+Which you can then pass to `ApplicationBatch.find` to load:
+
+```ruby
+batch = ApplicationBatch.find("daily-charge-batch:#{Date.today}:1")
+batch.class.name # => ChargeBatch
+batch.batch_id # => "daily-charge-batch:2019-07-25:1"
+```
+
+If you do not specify a `batch_id` one will be randomly generated.
+
+```ruby
+batch = ChargeBatch.process(date: Date.today)
+batch.batch_id # => XP-f-G23bNFwww
+```
+
 ##### Input
 
 A collection accepts input represented by arguments and options which initialize it.
@@ -130,7 +159,6 @@ A collection accepts input represented by arguments and options which initialize
 Arguments describe input required to define the initial state.
 
 If any arguments are missing, an ArgumentError is raised.
-
 
 ```ruby
 class ExampleJob < BatchProcessor::BatchJob
@@ -266,6 +294,12 @@ class ExampleBatch < ApplicationBatch
 end
 ```
 
+##### Retries
+
+TODO
+
+💡 **Note**: Failure is only triggered after all retries are exhausted for the job.
+
 #### Details
 
 The **Details** of a batch are the times of critical lifecycle events and the summary counts of processed jobs.
@@ -296,7 +330,7 @@ details.pending_jobs_count # => 2
 details.pending_jobs_count # => 1
 ```
 
-##### Methods
+##### Detail Methods
 
 | Name                    | Type       | Description                                |
 | ----------------------- | ---------- | ------------------------------------------ |
@@ -324,13 +358,85 @@ details.pending_jobs_count # => 1
 
 The **Status** of a batch is manifested by a collection of predicates which track certain lifecycle events.
 
-TODO: Table of Statuses
+```ruby
+batch = ExampleBatch.process
+batch.started? # => true
+batch.enqueued? # => false
+batch.aborted? # => false
+batch.finished? # => true
+
+batch.enqueued_jobs? # => false
+batch.finished_jobs? # => true
+```
+
+##### Status Methods
+
+| Name                | Description                                     |
+| ------------------- | ----------------------------------------------- |
+| `started?`          | True if `started_at` is defined for the batch.  |
+| `enqueued?`         | True if `enqueued_at` is defined for the batch. |
+| `aborted?`          | True if `aborted_at` is defined for the batch.  |
+| `cleared?`          | True if `cleared_at` is defined for the batch.  |
+| `finished?`         | True if `finished_at` is defined for the batch. |
+| `enqueued_jobs?`    | True if `enqueued_jobs_count > 0`.              |
+| `pending_jobs?`     | True if `pending_jobs_count > 0`.               |
+| `running_jobs?`     | True if `running_jobs_count > 0`.               |
+| `failed_jobs?`      | True if `failed_jobs_count > 0`.                |
+| `canceled_jobs?`    | True if `canceled_jobs_count > 0`.              |
+| `unfinished_jobs?`  | True if `unfinished_jobs_count > 0`.            |
+| `finished_jobs?`    | True if `finished_jobs_count > 0`.              |
+| `collection_valid?` | True if all the Collection's validations pass.  |
+| `processing?`       | True if started, unfinished, and not aborted.   |
 
 #### Callbacks
 
 Batches have a status which is driven by the jobs it is processing. Callbacks are fired in response to status changes.
 
-TODO: Table Of Callbacks
+```ruby
+class ExampleBatch < ApplicationBatch
+  class Collection < BatchCollection
+    def items
+      [ SecureRandom.hex ]
+    end
+  end
+  
+  on_batch_started { SlackClient.send_message("Batch started!") }
+  on_batch_finished { SlackClient.send_message("Batch finished!") }
+  
+  on_batch_aborted :handle_batch_aborted, unless: -> { Business.during_business_hours? }
+  on_batch_cleared :handle_batch_cleared, if: :important?
+  
+  def important?
+    batch_id.include?("vip")
+  end
+  
+  def handle_batch_aborted
+    EmailClient.send_email("management@business.engineering", "Unexpected batch abort!", batch_id)
+  end
+  
+  def handle_batch_cleared
+    EmailClient.send_email("developers@business.engineering", "Crazy stuff happened!", details.to_h)
+  end
+end
+```
+
+##### Callback Methods
+
+| Name                | Triggered when...                                   |
+| ------------------- | --------------------------------------------------- |
+| `on_batch_started`  | The batch is started.                               |
+| `on_batch_enqueued` | `[Parallel]` All batch jobs are enqueued.           |
+| `on_batch_aborted`  | The batch is aborted.                               |
+| `on_batch_cleared`  | The batch is cleared.                               |
+| `on_batch_finished` | The batch is finished.                              |
+| `on_job_enqueued`   | A batch job is enqueued.                            |
+| `on_job_running`    | A batch job begins performing.                      |
+| `on_job_success`    | A batch job is successfully performed.              |
+| `on_job_failure`💡  | A batch job raises an error being performed.        |
+| `on_job_retried`    | A batch job is retried rather than failing.         |
+| `on_job_canceled`   | A batch job skips perform after a batch is aborted. |
+
+💡 **Note**: Failure is only triggered after all retries are exhausted for the job.
 
 ### Processors
 
