@@ -332,27 +332,27 @@ details.pending_jobs_count # => 1
 
 ##### Detail Methods
 
-| Name                    | Type       | Description                                |
-| ----------------------- | ---------- | ------------------------------------------ |
-| `batch_id`              | `String`   | The unique ID of the batch's instance.     |
-| `class_name`            | `String`   | The name of the batch's class.             |
-| `started_at`            | `DateTime` | When processing began on the batch.        |
-| `enqueued_at`           | `DateTime` | `[Parallel]` When all jobs were enqueued.  |
-| `aborted_at`            | `DateTime` | When `#abort!` was called on the batch.    |
-| `cleared_at`            | `DateTime` | When `#clear!` was called on the batch.    |
-| `finished_at`           | `DateTime` | When processing finished on the batch.     |
-| `size`                  | `Number`   | Count of items in the batch's collection.  |
-| `enqueued_jobs_count`   | `Number`   | `[Parallel]` Count of the jobs enqueued.   |
-| `pending_jobs_count`    | `Number`   | Count of jobs waiting to be performed.     |
-| `running_jobs_count`    | `Number`   | Count of jobs currently being performed.   |
-| `successful_jobs_count` | `Number`   | Count of jobs performed successfully.      |
-| `failed_jobs_count`     | `Number`   | Count of jobs which raised errors.         |
-| `canceled_jobs_count`   | `Number`   | Count of jobs NOT performed from `abort`.  |
-| `cleared_jobs_count`    | `Number`   | Count of missing jobs flushed by `clear`.  |
-| `total_retries_count`   | `Number`   | Total count of retry attempts by all jobs. |
-| `unfinished_jobs_count` | `Number`   | Current count of jobs pending and running. |
-| `finished_jobs_count`   | `Number`   | Current count of jobs already performed.   |
-| `total_jobs_count`      | `Number`   | Count of jobs (which should equal `size`). |
+| Name                  | Type     | Description                                |
+| --------------------- | -------- | ------------------------------------------ |
+| batch_id              | String   | The unique ID of the batch's instance.     |
+| class_name            | String   | The name of the batch's class.             |
+| started_at            | DateTime | When processing began on the batch.        |
+| enqueued_at           | DateTime | `[Parallel]` When all jobs were enqueued.  |
+| aborted_at            | DateTime | When `#abort!` was called on the batch.    |
+| cleared_at            | DateTime | When `#clear!` was called on the batch.    |
+| finished_at           | DateTime | When processing finished on the batch.     |
+| size                  | Number   | Count of items in the batch's collection.  |
+| enqueued_jobs_count   | Number   | `[Parallel]` Count of the jobs enqueued.   |
+| pending_jobs_count    | Number   | Count of jobs waiting to be performed.     |
+| running_jobs_count    | Number   | Count of jobs currently being performed.   |
+| successful_jobs_count | Number   | Count of jobs performed successfully.      |
+| failed_jobs_count     | Number   | Count of jobs which raised errors.         |
+| canceled_jobs_count   | Number   | Count of jobs NOT performed from `abort`.  |
+| cleared_jobs_count    | Number   | Count of missing jobs flushed by `clear`.  |
+| total_retries_count   | Number   | Total count of retry attempts by all jobs. |
+| unfinished_jobs_count | Number   | Current count of jobs pending and running. |
+| finished_jobs_count   | Number   | Current count of jobs already performed.   |
+| total_jobs_count      | Number   | Count of jobs (which should equal `size`). |
 
 #### Status
 
@@ -371,22 +371,22 @@ batch.finished_jobs? # => true
 
 ##### Status Methods
 
-| Name                | Description                                     |
-| ------------------- | ----------------------------------------------- |
-| `started?`          | True if `started_at` is defined for the batch.  |
-| `enqueued?`         | True if `enqueued_at` is defined for the batch. |
-| `aborted?`          | True if `aborted_at` is defined for the batch.  |
-| `cleared?`          | True if `cleared_at` is defined for the batch.  |
-| `finished?`         | True if `finished_at` is defined for the batch. |
-| `enqueued_jobs?`    | True if `enqueued_jobs_count > 0`.              |
-| `pending_jobs?`     | True if `pending_jobs_count > 0`.               |
-| `running_jobs?`     | True if `running_jobs_count > 0`.               |
-| `failed_jobs?`      | True if `failed_jobs_count > 0`.                |
-| `canceled_jobs?`    | True if `canceled_jobs_count > 0`.              |
-| `unfinished_jobs?`  | True if `unfinished_jobs_count > 0`.            |
-| `finished_jobs?`    | True if `finished_jobs_count > 0`.              |
-| `collection_valid?` | True if all the Collection's validations pass.  |
-| `processing?`       | True if started, unfinished, and not aborted.   |
+| Name              | Description                                     |
+| ----------------- | ----------------------------------------------- |
+| started?          | True if `started_at` is defined for the batch.  |
+| enqueued?         | True if `enqueued_at` is defined for the batch. |
+| aborted?          | True if `aborted_at` is defined for the batch.  |
+| cleared?          | True if `cleared_at` is defined for the batch.  |
+| finished?         | True if `finished_at` is defined for the batch. |
+| enqueued_jobs?    | True if `enqueued_jobs_count > 0`.              |
+| pending_jobs?     | True if `pending_jobs_count > 0`.               |
+| running_jobs?     | True if `running_jobs_count > 0`.               |
+| failed_jobs?      | True if `failed_jobs_count > 0`.                |
+| canceled_jobs?    | True if `canceled_jobs_count > 0`.              |
+| unfinished_jobs?  | True if `unfinished_jobs_count > 0`.            |
+| finished_jobs?    | True if `finished_jobs_count > 0`.              |
+| collection_valid? | True if all the Collection's validations pass.  |
+| processing?       | True if started, unfinished, and not aborted.   |
 
 #### Callbacks
 
@@ -422,21 +422,19 @@ end
 
 ##### Callback Methods
 
-| Name                | Triggered when...                                   |
-| ------------------- | --------------------------------------------------- |
-| `on_batch_started`  | The batch is started.                               |
-| `on_batch_enqueued` | `[Parallel]` All batch jobs are enqueued.           |
-| `on_batch_aborted`  | The batch is aborted.                               |
-| `on_batch_cleared`  | The batch is cleared.                               |
-| `on_batch_finished` | The batch is finished.                              |
-| `on_job_enqueued`   | A batch job is enqueued.                            |
-| `on_job_running`    | A batch job begins performing.                      |
-| `on_job_success`    | A batch job is successfully performed.              |
-| `on_job_failure`💡  | A batch job raises an error being performed.        |
-| `on_job_retried`    | A batch job is retried rather than failing.         |
-| `on_job_canceled`   | A batch job skips perform after a batch is aborted. |
-
-💡 **Note**: Failure is only triggered after all retries are exhausted for the job.
+| Name              | Triggered when...                                   |
+| ----------------- | --------------------------------------------------- |
+| on_batch_started  | The batch is started.                               |
+| on_batch_enqueued | `[Parallel]` All batch jobs are enqueued.           |
+| on_batch_aborted  | The batch is aborted.                               |
+| on_batch_cleared  | The batch is cleared.                               |
+| on_batch_finished | The batch is finished.                              |
+| on_job_enqueued   | A batch job is enqueued.                            |
+| on_job_running    | A batch job begins performing.                      |
+| on_job_success    | A batch job is successfully performed.              |
+| on_job_failure    | A batch job raises an error being performed.        |
+| on_job_retried    | A batch job is retried rather than failing.         |
+| on_job_canceled   | A batch job skips perform after a batch is aborted. |
 
 ### Processors
 
