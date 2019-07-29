@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# RSpec matcher that tests usages of `.with_parallel_processor`
+# RSpec matcher that tests usages of `.with_sequential_processor`.
 #
 #     class ExampleBatch < ApplicationBatch
 #       with_sequential_processor

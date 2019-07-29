@@ -809,23 +809,189 @@ end
 
 ## Testing
 
-TODO
+If you plan on writing `RSpec` tests `BatchProcessor` comes packaged with some custom matchers.
 
 ### Testing Setup
 
-TODO
+Add the following to your spec/rails_helper.rb file:
+
+```ruby
+require "batch_prcessor/spec_helper"
+```
+
+BatchProcessor works best with [shoulda-matchers](https://github.com/thoughtbot/shoulda-matchers) and [rspice](https://github.com/Freshly/spicerack/tree/master/rspice).
+
+Add them to the development and test group of your Gemfile:
+
+```ruby
+group :development, :test do 
+  gem "shoulda-matchers", git: "https://github.com/thoughtbot/shoulda-matchers.git", branch: "rails-5"
+  gem "rspice"
+end
+```
+
+Then run `bundle install` and add the following into `spec/rails_helper.rb`:
+
+```ruby
+require "rspec/rails"
+require "rspice"
+require "batch_processor/spec_helper"
+
+# Configuration for the shoulda-matchers gem
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
+  end
+end
+```
+
+This will allow you to use the following custom matchers:
+
+* [set_processor_option](lib/batch_processor/rspec/custom_matchers/set_processor_option.rb) tests usages of batches specifying processor options.
+* [use_default_job_class](lib/batch_processor/rspec/custom_matchers/use_default_job_class.rb) tests usages of batches which do not explicitly specify a job.
+* [use_default_processor](lib/batch_processor/rspec/custom_matchers/use_default_processor.rb) tests usages of batches which do not explicitly specify a processor.
+* [use_job_class](lib/batch_processor/rspec/custom_matchers/use_job_class.rb) tests usages of batches which explicitly specify a job.
+* [use_parallel_processor](lib/batch_processor/rspec/custom_matchers/use_parallel_processor.rb) tests usages of `.with_parallel_processor`.
+* [use_sequential_processor](lib/batch_processor/rspec/custom_matchers/use_sequential_processor.rb) tests usages of `.with_sequential_processor`.
+
+There are also some internal matchers added:
+
+* [use_batch_processor_strategy](lib/batch_processor/rspec/custom_matchers/use_batch_processor_strategy.rb) is used to DRY out the similarities between the other batch processor matchers.
 
 ### Testing Batches
 
-TODO
+The best way to test a Batch is with an integration test.
+
+The easiest way to test a Batch is with a unit test.
+
+Batches are generated with the following RSPec template:
+
+```ruby
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe FooBatch, type: :batch do
+  subject { described_class }
+
+  it { is_expected.to inherit_from BatchProcessor::BatchBase }
+
+  # it { is_expected.to use_sequential_processor }
+  # it { is_expected.to use_parallel_processor }
+
+  # it { is_expected.to be_allow_empty }
+
+  # it { is_expected.to use_default_job_class }
+  # it { is_expected.to use_job_class OtherJob }
+
+  # it { is_expected.to set_processor_option :continue_after_exception, true }
+  # it { is_expected.to set_processor_option :sorted, true }
+  # it { is_expected.not_to be_allow_empty }
+
+  describe FooBatch::Collection, type: :batch_collection do
+    subject { described_class.new }
+
+    it { is_expected.to inherit_from BatchProcessor::BatchBase::BatchCollection }
+    # it { is_expected.to define_argument :arg, allow_nil: false }
+    # it { is_expected.to define_option :opt, default: 3 }
+  end
+end
+```
+
+#### Testing Collections
+
+If your Collections are complicated enough that you want to put them into a separate file, they are **too** complicated.
+
+Collections are expected to be incredibly straightforward objects with minimal validations and logic.
+
+Highly maintainable collections should essentially be input sanity checks around something like an `ActiveRecord` scope:
+
+```ruby
+class Collection < BatchCollection
+  argument :charge_date
+  
+  validate :charge_date, date: { is_today_or_future: true }
+  
+  def items
+    Orders.to_charge_on(charge_date).payment_pending
+  end
+end
+```
+
+This will allow you to keep this class as a slim, which is the intent!
 
 ### Testing Jobs
 
-TODO
+BatchProcessor, though heavily reliant on jobs, does not include anything special or specific to test them.
+
+Any job descending from `BatchProcessor::BatchableJob` (which has `ActiveJob::Base` as its parent) is batchable.
+
+You can **and should** test your jobs, but there is nothing "special about them".
+
+Ideally, if you're starting with a collection of well-built jobs, they should work nearly effortlessly here.
+
+Admittedly "well-built" is subjective, but taken here to mean "clearly defined error handling and one responsibility".
+
+Generally speaking the same suggestions for testing collections apply to `ActiveJob`.
+
+🤓 **HUMBLE OBSERVATION**: The best jobs are slim wrappers around clearly defined services.
+
+```ruby
+class ExampleJob < ApplicationJob
+  def perform(id)
+    the_thing = Thing.find(id)
+    raise Thing::Locked if the_thing.locked?
+    
+    the_thing.lock!
+    info :locked_thing, the_thing: the_thing
+    
+    the_stuff = Stuff.for(the_thing)
+    info :got_stuff, the_stuff: the_stuff
+    
+    the_thing.make_do(the_stuff)
+    info :made_the_thing_do_the_stuff
+  end
+end
+
+# Executed with...
+ExampleJob.perform_later(the_thing.id)
+```
+
+You should always move all that stuff into a service object:
+
+```ruby
+class ExampleJob < ApplicationJob
+  def perform(the_thing)
+    DoTheStuffService.for(the_thing)
+  end
+end
+
+# Let globalID take care of this! Don't reinvent wheels!
+ExampleJob.perform(the_thing)
+```
+
+If this feels right to you, check out [flow](https://github.com/Freshly/flow). You'll like what you see, I guarantee it.
 
 ### Integration Testing
 
-TODO
+Effective integration testing for batches requires you to configure `ActiveJob` for testing.
+
+There are lots of solutions to this puzzle, so you're expected to pick your own poison in that regard.
+
+Once you have everything configured to effectively unit test jobs, you can confirm the behavior of your batch.
+
+A comprehensive suite of integration tests for a batch will cover three contexts:
+
+1) When the batch finishes successfully.
+2) When the batch finishes with some errors.
+3) When you manually intervene with the batch.
+
+These are basically the only circumstances that you will actually encounter in the real world, so you should test them.
+
+Writing general purpose handlers for batch aborts and clears will save you a lot of trouble and excess testing!
+
+Pretty much every manual intervention in a batch will elicit a "stuff is on fire" response from the team anyway.
 
 ## Custom Processors
 
@@ -898,7 +1064,11 @@ You can refer to the existing [processors](lib/batch_processor/processors) for r
 
 ### Testing Processors
 
-TODO
+Testing custom processors is best suited by unit tests and confirmed by integration tests. 
+
+There's a lot that can go wrong when batching lots of jobs is involved, and it really helps to have unit tests on this.
+
+I can't offer more guidance on writing good unit tests for processors other than suggesting [riffing on these](spec/batch_processor/processors).
 
 ## Contributing
 
