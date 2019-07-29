@@ -33,6 +33,8 @@ Define your collection, job, and callbacks all in one clear and concise object
   * [Best Practice](#best-practice)
   * [Aborting](#aborting)
      * [Clearing](#clearing)
+  * [Monitor Job](#monitor-job)
+  * [Monitor Cron](#monitor-cron)
 * [Testing](#testing)
    * [Testing Setup](#testing-setup)
    * [Testing Batches](#testing-batches)
@@ -290,9 +292,34 @@ end
 
 ##### Retries
 
-TODO
+BatchProcessor is designed to work with ActiveJob's built in retries.
 
-💡 **Note**: Failure is only triggered after all retries are exhausted for the job.
+Any job with a valid retry strategy will be allowed to exhaust all of it's attempts before it will be considered failed.
+
+When a job raises with retries remaining, the batch essentially "ignores" it ever ran, which allows it to be retried.
+
+To keep track of how often these handled failures are happening, the batch keeps a running tally of total retries.
+ 
+```ruby
+batch = AppplicationBatch.find(batch_id)
+batch.details.total_retries_count # => 15
+```
+
+In this example the `15` count could mean any number of things:
+
+1. A single job raised, and was retried, 15 times.
+2. 3 jobs raised and were retried their maximum of 5 times before failing.
+3. 5 jobs raised and were retried their maximum of 3 times before failing.
+4. 15 different jobs all raised once and were retried, all of which were successful.
+5. 13 different jobs all raised once, and one failed twice more on top of that, before finished successfully.
+
+Because of the wide variety of cases this covers, the batch cannot and doesn't try to make decisions off this.
+
+Instead, this information is tracked to provide developers with some introspection as to the behavior of the batch.
+
+Ideally, the final state of the batch combined with the retry information and server logs should allow you to determine.
+
+💡 **Note**: Batch failure is only triggered after **all** retries are exhausted for the job.
 
 #### Details
 
@@ -558,12 +585,12 @@ class ExampleJob < ApplicationJob
     order.mark_charge_starting!
     
     charge_service = ChargeService.new(order)
-    charge_result = result.charge!
+    charge_result = charge_service.charge!
     
-    if result.success?
-      result.mark_charge_success!
+    if charge_result.success?
+      order.mark_charge_success!
     else
-      result.mark_payment_failed!
+      order.mark_payment_failed!
     end
   end
 end
@@ -582,20 +609,15 @@ In this example, if you had say, 30 workers processing your batch, you could exp
  
 ### Aborting
 
-![aborting](docs/images/aborting.png)
-
 Batches can be **Aborted**.
 
-```ruby
-batch = ApplicationBatch.find(some_batch_id)
-batch.abort!
-```
+![aborting](docs/images/aborting.png)
 
-When aborted, processing will continue on enqueued jobs but **jobs will not be performed**.
+When aborted, processing *will continue* on enqueued jobs but **those jobs will not be performed**.
 
-This is overall less disruptive (and much easier) than manually removing enqueued ActiveJobs.
+Abort only prevents new jobs from being performed, as this is less disruptive (and much easier) than queue flushing.
 
-When perform is skipped because of an aborted batch, the job reports itself as **canceled**.
+When a job is skipped because of an aborted batch, it reports itself as **canceled**.
 
 ```ruby
 batch = ApplicationBatch.find(some_batch_id)
@@ -612,7 +634,7 @@ details.canceled_jobs_count # => 1
 details.canceled_jobs_count # => 2
 ```
 
-💡 **Note**: Aborting only prevents new jobs from being performed. Running jobs will complete normally if `#abort!` was called after they began to process.
+💡 **Note**: Running jobs will complete normally if `#abort!` was called after perform began on them.
 
 #### Clearing
 
@@ -640,6 +662,126 @@ details.cleared_jobs_count # => 4
 💡 **Note**: Calling `#clear!` on a batch will trigger the batch completion events and finish the batch.
 
 There is no use case to `#clear!` an in-flight batch and doing so is incredibly disruptive and corrupt the counts.
+
+### Monitor Job
+
+Because of the nature of `"weird stuff"` that can happen in processing, it's highly encouraged you add monitoring.
+
+The most common kind of monitoring that supports operations like this well are "dead man switches".
+
+[Dead Man's Snitch](https://deadmanssnitch.com) is an example of a monitoring service that can help!
+
+You could also construct a batch monitor job that works for any / all batches and can be enqueued alongside:
+
+```ruby
+class BatchMonitorJob < ApplicationBatch
+  queue_name :a_higher_priority_than_any_jobs
+  
+  def perform(batch_id)
+    batch = ApplicationBatch.find(batch_id)
+    batch.abort! unless batch.finished? 
+  end
+end
+```
+
+With a job like this, you can add a monitor to any batch:
+
+```ruby
+batch_id = SecureRandom.hex
+SomeImportantBatch.process(batch_id: batch_id)
+BatchMonitorJob.set(wait: 20.minutes).perform_later(batch_id)
+```
+
+There are *several* important notes here. 
+
+**Delayed Jobs**
+
+You must have configured ActiveJob with a queue processor that supports delayed jobs, and any extra hoops therein.
+
+💁 **Example**: On Resque, a second worker and suite of gems is required to support `.set(wait: 20.minutes)`!
+
+Please make sure to consult your given ActiveJob queue processor's own documentation for supporting delayed jobs.
+
+**Delay**
+
+There is no such thing as "normal" for what to expect for processing time. You can expectation set using the following:
+
+```text
+good_timeout = ((number_of_jobs * average_time_per_job) / average_number_of_workers_available) + rand(5).minutes
+```
+
+For some batches, you may expect 10 minutes to be more than sufficient to process the whole workload.
+
+For other batches, you may expect 2 hours to be a very conservative and aggressive estimate for completion.
+
+Sometimes, the 10 minute batch could take over 2 hours if enqueued at the same time if other jobs are taking resources.
+
+Because of the great variability here, you need to assess the differences of your own environment and adapt accordingly.
+
+**Queue Priority**
+
+Delayed jobs get enqueued after their delay at the REAR of the queue.
+
+As such, your monitor **must** have a higher priority than any of jobs it's meant to monitor!
+
+Otherwise it will be enqueued and processed after all the jobs finish, which defeats the purpose of this!
+
+Because queueing theory is hard and there isn't really a great standard and several approaches, you're on your own here.
+
+Sorry, and godspeed!
+
+**Notifications**
+
+This automation is only a "best practice" for keeping things more or less clean. 
+
+Anytime an abort happens, developers likely need to look into why, as it should be considered an exceptional event.
+
+As such, you are encouraged to setup notifications and alerting to communicate these events to your staff.
+
+There are lots of solutions for how to setup this kind of monitoring, like using an internal mailer:
+
+```ruby
+class ApplicationBatch < BatchProcessor::BatchBase
+  on_batch_aborted { EngineeringMailer.batch_timeout(batch: self) }
+end
+```
+
+### Monitor Cron
+
+Another alternative which inherits different constraints is setting up a cron task to monitory our batches.
+
+Again, depending on the specifics of your environment and needs, there are several different solutions here as well.
+
+Let's assume you already have invested in a cron solution like the [clockwork gem](https://rubygems.org/gems/clockwork).
+
+If you know for instances that your charge batch was certainly supposed to have started by 8PM, write that:
+
+```ruby
+every(1.day, 'charge_start.job', at: '20:00') do
+  batch_id = "charge-batch-for-#{Date.today}"
+  begin
+    batch = ApplicationBatch.find(batch_id)
+    EngineeringMailer.charge_batch_not_started(batch_id) unless batch.started?
+  rescue StandardError => exception
+    EngineeringMailer.charge_batch_not_found(exception)
+  end
+end
+```
+
+Likewise, if by 10PM it needs to be finished or you want it aborted, write that:
+
+```ruby
+every(1.day, 'charge_start.job', at: '22:00') do
+  batch_id = "charge-batch-for-#{Date.today}"
+  begin
+    batch = ApplicationBatch.find(batch_id)
+    # Assuming you have some kind of generic `on_batch_abort` that handles notifications
+    batch.abort! unless batch.completed?
+  rescue StandardError => exception
+    EngineeringMailer.charge_batch_not_found(exception)
+  end
+end
+```
 
 ## Testing
 
