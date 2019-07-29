@@ -1,0 +1,9 @@
+Description:
+    Creates ApplicationBatch with tests.
+
+Example:
+    `rails generate batch_processor:install`
+
+    Generates:
+      Batch: app/batches/application_batch.rb
+       Test: spec/batches/application_batch_spec.rb

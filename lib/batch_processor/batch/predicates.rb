@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Predicates allow inspection of the status of a batch.
+# The **Status** of a batch is manifested by a collection of predicates which track certain lifecycle events.
 module BatchProcessor
   module Batch
     module Predicates
@@ -10,6 +10,8 @@ module BatchProcessor
         date_predicate :started, :enqueued, :aborted, :cleared, :finished
 
         job_count_predicate :enqueued, :pending, :running, :failed, :canceled, :unfinished, :finished
+
+        delegate :valid?, to: :collection, prefix: true
       end
 
       def processing?

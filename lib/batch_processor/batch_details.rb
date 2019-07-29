@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# The details of a batch represent the state of the work to process.
+# The **Details** of a batch are the times of critical lifecycle events and the summary counts of processed jobs.
 module BatchProcessor
   class BatchDetails < Spicerack::RedisModel
     attr_reader :batch_id

@@ -1,0 +1,9 @@
+Description:
+    Create the ApplicationBatch and test.
+
+Example:
+    `rails generate batch_processor:application_batch`
+
+    Generates:
+       Flow: app/batches/application_batch.rb
+       Test: spec/batches/application_batch_spec.rb

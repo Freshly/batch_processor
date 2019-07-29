@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-# When processed, the batch performs a job for each item in its collection.
+# Unless otherwise specified a `Batch` uses the **default** `Parallel` Processor.
 module BatchProcessor
   module Batch
     module Processor
       extend ActiveSupport::Concern
 
-      # This is left mutable for extension and customization
+      # The default processors can be redefined and new custom ones can be added as well.
       # rubocop:disable Style/MutableConstant
       PROCESSOR_CLASS_BY_STRATEGY = {
         default: BatchProcessor::Processors::Parallel,
@@ -31,6 +31,10 @@ module BatchProcessor
           new(*arguments).process
         end
 
+        def process!(*arguments)
+          new(*arguments).process!
+        end
+
         def processor_class
           return @processor_class if defined?(@processor_class)
 
@@ -45,13 +49,22 @@ module BatchProcessor
 
         private
 
+        # Certain processors have configurable options; this configuration is specified in the Batch's definition.
         def processor_option(option, value = nil)
           _processor_options[option.to_sym] = value
         end
       end
 
-      def process
+      def process!
         processor_class.execute(batch: self, **_processor_options)
+        self
+      end
+
+      def process
+        process!
+      rescue StandardError => exception
+        error :process_error, exception: exception
+        self
       end
     end
   end

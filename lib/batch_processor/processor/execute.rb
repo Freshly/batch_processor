@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# When executed, the processor performs a job for each item in the batch collection.
+# When `.process` is called on a Batch, `.execute` is called on the `Processor` specified in the Batch's definition.
 module BatchProcessor
   module Processor
     module Execute

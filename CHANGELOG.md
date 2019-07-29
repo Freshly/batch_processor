@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.3.0
+
+*Release Date*: 7/29/2019
+
+- Added README documentation
+- Cleaned up code and comments
+- Added install generators
+- Added template generators
+
 ## v0.2.6
 
 *Release Date*: 6/27/2019

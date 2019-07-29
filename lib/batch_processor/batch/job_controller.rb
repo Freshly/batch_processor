@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# The job controller performs updates on and tracks details related to the jobs in a batch.
+# A BatchJob calls into the Batch to report on it's lifecycle from start to finish, including on success and failure.
 module BatchProcessor
   module Batch
     module JobController

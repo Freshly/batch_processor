@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# The controller performs updates on and tracks details of a batch.
+# Batches have a status which is driven by the jobs it is processing. Callbacks are fired in response to status changes.
 module BatchProcessor
   module Batch
     module Controller

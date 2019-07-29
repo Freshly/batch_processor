@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# RSpec matcher that tests usages of batches which do not specify a processor
+# RSpec matcher that tests usages of batches specifying processor options.
 #
 #     class ExampleBatch < ApplicationBatch
 #       processor_option :sorted, true
