@@ -17,8 +17,6 @@ Define your collection, job, and callbacks all in one clear and concise object
          * [Validations](#validations)
       * [ActiveJob](#activejob)
          * [Retries](#retries)
-      * [Aborting](#aborting)
-         * [Clearing](#clearing)
       * [Details](#details)
          * [Detail Methods](#detail-methods)
       * [Status](#status)
@@ -31,6 +29,10 @@ Define your collection, job, and callbacks all in one clear and concise object
          * [Processor Options](#processor-options)
    * [Jobs](#jobs)
       * [Handling Errors](#handling-errors)
+* [Troubleshooting](#troubleshooting)
+  * [Best Practice](#best-practice)
+  * [Aborting](#aborting)
+     * [Clearing](#clearing)
 * [Testing](#testing)
    * [Testing Setup](#testing-setup)
    * [Testing Batches](#testing-batches)
@@ -269,14 +271,6 @@ batch.started? # => false
 batch.collection_valid? # => false
 batch.collection.errors.messages # => {:first_name=>["is too short (minimum is 2 characters)"]}
 ```
-
-#### Aborting
-
-TODO
-
-##### Clearing
-
-TODO
 
 #### ActiveJob
 
@@ -517,6 +511,135 @@ A BatchJob calls into the Batch to report on it's lifecycle from start to finish
 #### Handling Errors
 
 TODO
+
+## Troubleshooting
+
+Sometimes, `"weird stuff"` (this is a technical term) happens on the internet.
+
+One example is a vanishing job:
+
+- A job is picked off the queue and usually takes 18 seconds process.
+- 5 seconds into performing, the worker received a `SIGTERM`.
+- The worker, being Resque, decides to dirty exit instead of graceful shutdown.
+- The job never completes, never is retried, never enters the queue again, and never reports status.
+- The `running_jobs_count` of your batch and will contain a count that will never go down.
+- Because one of the jobs has not reported in, the batch will never complete.
+
+⚠️ **Warning**: This kind of "weird stuff" can always happen, and at scale **WILL** always happen! Be prepared!
+
+### Best Practice
+
+Troubleshooting this issue will be very similar to troubleshooting any batch issues, but no two issues are fully alike.
+
+What follows is therefore the generic "best practice" for handling any class of batch issue.
+
+1. Abort the Batch. This stops any new batches from processing and allows any enqueued jobs to flush from the workers.
+2. Damage Report. Figure out what went wrong and what needs to be cleaned up. 
+3. Cleanup Fallout. Perform all the cleanup as determined in step 2.
+4. Wait. Allow time for the workers to chew through and cancel the pending jobs in your aborted batch.
+5. Clear the Batch. Manually flush any lost jobs, forcing the batch to run it's completion events.
+
+**Abort the Batch**
+
+```ruby
+batch = ApplicationBatch.find(batch_id)
+batch.abort!
+```
+
+**Damage Report**
+
+💡 **Note**: By the nature of async processing your jobs can (and likely will, given enough workers) fail at every line:
+
+```ruby
+class ExampleJob < ApplicationJob
+  def perform(order)
+    raise NotProcessing unless order.payment_processing?
+    
+    order.mark_charge_starting!
+    
+    charge_service = ChargeService.new(order)
+    charge_result = result.charge!
+    
+    if result.success?
+      result.mark_charge_success!
+    else
+      result.mark_payment_failed!
+    end
+  end
+end
+```
+
+In this example, if you had say, 30 workers processing your batch, you could expect to see the following issues:
+
+- Orders which were taken off the queue, marked as running, and then never passed the guard clause.
+- Orders which were marked that the charge was starting, but the service was never instantiated.
+- 😱 Orders which were submitted and a customer's money was taken, but your application has no record of that!
+- Orders submitted and a customer did not have funds available, but the application has no record of that EITHER!!
+- We get the response, but are not capable of reporting success about the charge in the database.
+- We actually record success in the database but the job cannot report itself as having completed to the batch!
+
+💁‍ **The Rule of Law**: For every `N` lines of code in your job, you create `N+2` **at least** unique problems. 😬
+ 
+### Aborting
+
+![aborting](docs/images/aborting.png)
+
+Batches can be **Aborted**.
+
+```ruby
+batch = ApplicationBatch.find(some_batch_id)
+batch.abort!
+```
+
+When aborted, processing will continue on enqueued jobs but **jobs will not be performed**.
+
+This is overall less disruptive (and much easier) than manually removing enqueued ActiveJobs.
+
+When perform is skipped because of an aborted batch, the job reports itself as **canceled**.
+
+```ruby
+batch = ApplicationBatch.find(some_batch_id)
+details = batch.details
+
+details.performed_jobs_count # => 7
+details.performed_jobs_count # => 8
+details.canceled_jobs_count # => 0
+
+batch.abort!
+
+details.performed_jobs_count # => 8
+details.canceled_jobs_count # => 1
+details.canceled_jobs_count # => 2
+```
+
+💡 **Note**: Aborting only prevents new jobs from being performed. Running jobs will complete normally if `#abort!` was called after they began to process.
+
+#### Clearing
+
+Because clearing is a manual process only to be used in exceptional circumstances, it **requires** the batch be aborted.
+
+In these cases, after a developer intervenes to assess the impact of the failure, the batch can be manually cleared.
+
+```ruby
+batch = ApplicationBatch.find(some_batch_id)
+details = batch.details
+
+details.size # => 10
+details.pending_jobs_count # => 2
+details.running_jobs_count # => 2
+details.finished_jobs_count # => 6
+details.cleared_jobs_count # => 0
+
+details.clear!
+
+details.running_jobs_count # => 0
+details.pending_jobs_count # => 0
+details.cleared_jobs_count # => 4
+```
+
+💡 **Note**: Calling `#clear!` on a batch will trigger the batch completion events and finish the batch.
+
+There is no use case to `#clear!` an in-flight batch and doing so is incredibly disruptive and corrupt the counts.
 
 ## Testing
 
