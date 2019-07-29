@@ -7,6 +7,7 @@ require_relative "batch/predicates"
 require_relative "batch/controller"
 require_relative "batch/job_controller"
 
+# A **Batch** defines, controls, and monitors the processing of a collection of items with an `ActiveJob`.
 module BatchProcessor
   class BatchBase < Spicerack::InputObject
     class BatchCollection < BatchProcessor::Collection; end

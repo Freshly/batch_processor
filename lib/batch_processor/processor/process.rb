@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Processing a batch performs a job for each item in the batch collection.
+# Processing a Batch performs a job for each item in its collection if **and only if** it has a valid collection.
 module BatchProcessor
   module Processor
     module Process

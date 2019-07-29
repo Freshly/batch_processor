@@ -4,21 +4,21 @@ RSpec.describe RedGreenBatch, type: :integration do
   let(:enqueued_jobs) { ActiveJob::Base.queue_adapter.enqueued_jobs }
 
   context "without any arguments" do
-    subject(:process) { described_class.process }
+    subject(:process!) { described_class.process! }
 
     it "raises" do
-      expect { process }.to raise_error ArgumentError, "Missing argument: color"
+      expect { process! }.to raise_error ArgumentError, "Missing argument: color"
     end
   end
 
   context "when the color is invalid" do
-    subject(:process) { batch.process }
+    subject(:process!) { batch.process! }
 
     let(:batch) { described_class.new(color: color) }
     let(:color) { "blue" }
 
     it "raises and sets errors" do
-      expect { process }.to raise_error BatchProcessor::CollectionInvalidError
+      expect { process! }.to raise_error BatchProcessor::CollectionInvalidError
       expect(batch.collection.errors.details[:color]).to eq([ { error: :inclusion, value: "blue" } ])
     end
   end

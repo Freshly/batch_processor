@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# The Parallel Processor enqueues jobs to be performed later.
 module BatchProcessor
   module Processors
     class Parallel < BatchProcessor::ProcessorBase

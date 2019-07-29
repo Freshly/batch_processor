@@ -82,6 +82,41 @@ RSpec.describe BatchProcessor::Batch::Processor, type: :module do
   describe "#process" do
     subject(:process) { example_batch.process }
 
+    context "with error" do
+      before do
+        allow(example_batch).to receive(:process!).and_raise StandardError
+        allow(example_batch).to receive(:error).and_call_original
+      end
+
+      it "calls logs the exception without raising" do
+        process
+        expect(example_batch).
+          to have_received(:error).
+          with(:process_error, exception: instance_of(StandardError))
+      end
+
+      it { is_expected.to eq example_batch }
+    end
+
+    context "without error" do
+      before { allow(example_batch).to receive(:process!).and_return result }
+
+      let(:result) { double }
+
+      it { is_expected.to eq result }
+    end
+  end
+
+  describe ".process" do
+    it_behaves_like "a class pass method", :process do
+      let(:test_class) { example_batch_class }
+      let(:call_class) { example_batch_class }
+    end
+  end
+
+  describe "#process!" do
+    subject(:process!) { example_batch.process! }
+
     let(:processor_class) { double }
     let(:processor_options) { Hash[*Faker::Lorem.words(2 * rand(1..2))].symbolize_keys }
 
@@ -92,12 +127,14 @@ RSpec.describe BatchProcessor::Batch::Processor, type: :module do
     end
 
     it "executes the processor" do
-      process
+      process!
       expect(processor_class).to have_received(:execute).with(batch: example_batch, **processor_options)
     end
+
+    it { is_expected.to be_an_instance_of example_batch_class }
   end
 
-  describe ".process" do
+  describe ".process!" do
     it_behaves_like "a class pass method", :process do
       let(:test_class) { example_batch_class }
       let(:call_class) { example_batch_class }

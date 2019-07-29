@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# RSpec matcher to DRY out the similarities between the other batch processor matchers.
+# RSpec matcher that tests usages of batches which explicitly specify a job.
 #
 #     class ExampleBatch < ApplicationBatch
 #       def self.job_class

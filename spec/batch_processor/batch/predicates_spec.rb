@@ -3,6 +3,8 @@
 RSpec.describe BatchProcessor::Batch::Predicates, type: :module do
   include_context "with an example batch"
 
+  it { is_expected.to delegate_method(:valid?).to(:collection).with_prefix(true) }
+
   shared_examples_for "a date predicate" do |detail, source|
     subject { example_batch.public_send(detail) }
 

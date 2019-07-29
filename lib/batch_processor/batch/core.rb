@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# A batch has an ID, details, and is recoverable as an STI.
+# Batches accept a unique identifier and input representing the arguments and options which define it's collection.
 module BatchProcessor
   module Batch
     module Core

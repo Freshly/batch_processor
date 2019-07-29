@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# The Sequential Processor uses `.perform_now` to procedurally process each job within the current thread.
 module BatchProcessor
   module Processors
     class Sequential < BatchProcessor::ProcessorBase

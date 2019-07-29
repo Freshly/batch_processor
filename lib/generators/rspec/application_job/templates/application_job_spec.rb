@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe ApplicationBatch, type: :batch do
-  it { is_expected.to inherit_from BatchProcessor::BatchBase }
+RSpec.describe ApplicationJob, type: :job do
+  it { is_expected.to inherit_from BatchProcessor::BatchJob }
 end
 
