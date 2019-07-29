@@ -510,6 +510,8 @@ The Parallel Processor enqueues jobs to be performed later.
 
 The Sequential Processor uses `.perform_now` to procedurally process each job within the current thread.
 
+⚠️ **WARNING**: Using a sequential processors disables job retries in a batch **even if they are defined and valid**!
+
 ##### Processor Options
 
 | Name                       | Description                                 |
@@ -517,7 +519,7 @@ The Sequential Processor uses `.perform_now` to procedurally process each job wi
 | `continue_after_exception` | If true, batch continues after job error.   |
 | `sorted`*                  | If true, `#find_each` will **not** be used. |
 
-💁‍ Note: `find_each` is used when possible, which ignores `order`; the flag only forces `#each`.
+💁 **HEADS UP**: `find_each` is used when possible, which ignores `order`; the flag only forces `#each`.
 
 ### Jobs
 
@@ -537,7 +539,29 @@ A BatchJob calls into the Batch to report on it's lifecycle from start to finish
 
 #### Handling Errors
 
-TODO
+When an error occurs in a BatchJob it will be tracked as a failure within a batch.
+
+This is true even if a `rescue_from` handler is defined for the batch.
+
+Intentionality is very difficult to ascertain in a topic as nuanced as error handling, so batches make some assumptions.
+
+1. If you define a `rescue_from`, you want to treat that exception as a batch failure BUT NOT a job failure.
+1. If you define a `rescue` in the `perform` block, you want to treat the exception as NEITHER a batch NOR job failure.
+1. If you define no rescue of any kind, you want to treat that exception as BOTH a batch AND a job failure.
+
+Because `BatchProcessor` cannot speculate on it therefore doesn't attempt to control your application's error handling.
+
+Instead, it only brings this incredibly dire warning:
+
+⚠️ **WARNING**: You should never **EVER** "manually retry" a batch job! This can mess up the counter!
+
+Defining a valid retry strategy within the job is the **ONLY** way to handle retries of a batch job! 
+
+If you attempt to manually re-enqueue a batch job from your processors failed queue, you **WILL** have a bad time.
+
+Instead, you should always follow the [Troubleshooting](#troubleshooting) guide to handle exceptional failures.
+
+👍 **NOTE**: It is considered a "best practice" to define error handling for all your jobs, batchable or otherwise!
 
 ## Troubleshooting
 
@@ -805,7 +829,72 @@ TODO
 
 ## Custom Processors
 
-TODO
+You are able to define your own custom processors and use them with the batch processor.
+
+The following example is incredibly contrived for the purposes of demonstration:
+
+Let's say you wanted a `NoBobProcessor` which enqueued jobs for anyone unless they had `Bob` in their name. 
+
+First, create an `app/batch_processors` directory. (really it can be in any folder, but why not be explicit?)
+
+Then create your new `NoBobProcessor` class which is a descendant of `BatchProcessor::ProcessorBase`.
+
+Generally speaking, when defining a processor you only need to define one method: `#process_collection_item`
+
+This method is called with each and every item from a Batch's `Collection` and the processor decides what to do with it.
+
+In our example, we will add a string-matching guard clause to exclude the `Bob`s of the world from processing.
+
+When writing processors, it's always best to assume a generic case. 
+
+For now, let's assume that's either being a string representing a name, or an object with a `#name` property to check.
+
+```ruby
+class NoBobProcessor < BatchProcessor::ProcessorBase
+  # Required for parallel processors to keep accurate and expected reporting
+  set_callback(:collection_processed, :after) { batch.enqueued }
+
+  def process_collection_item(item)
+    return if for_a_bob?(item)
+  
+    job = batch.job_class.new(item)
+    job.batch_id = batch.batch_id
+    job.enqueue
+  end
+  
+  private
+  
+  def for_a_bob?(item)
+    name = item.name if item.respond_to?(:name)
+    name ||= item if item.is_a?(String)
+    raise ArgumentError, "Unknown item: #{item}" if name.nil?
+  
+    name.include?("Bob")
+  end
+end
+```
+
+Then, it needs to be register as a processing strategy so batches can utilize it.
+
+To define it, create or edit a `config/initializers/batch_processor.rb` file and add the following line:
+
+```ruby
+ApplicationBatch::PROCESSOR_CLASS_BY_STRATEGY[:no_bobs] = NoBobProcessor
+```
+
+This will enable you to specify this processor within your batch:
+
+```ruby
+class ChargeNoBobsBatch < ApplicationBatch
+  use_no_bobs_processor
+  
+  # ...
+end
+```
+
+Reference your new processor by the name you used to enter it with the `PROCESSOR_CLASS_BY_STRATEGY` hash.
+
+You can refer to the existing [processors](lib/batch_processor/processors) for reference.
 
 ### Testing Processors
 
