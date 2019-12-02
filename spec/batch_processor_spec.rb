@@ -74,20 +74,24 @@ RSpec.describe BatchProcessor do
   describe described_class::StillProcessingError do
     it { is_expected.to inherit_from BatchProcessor::Error }
     it { is_expected.to have_prototype_name "StillProcessing" }
+    it { is_expected.to conjugate_into BatchProcessor::Malfunction::StillProcessing }
   end
 
   describe described_class::NotProcessingError do
     it { is_expected.to inherit_from BatchProcessor::Error }
     it { is_expected.to have_prototype_name "NotProcessing" }
+    it { is_expected.to conjugate_into BatchProcessor::Malfunction::NotProcessing }
   end
 
   describe described_class::NotAbortedError do
     it { is_expected.to inherit_from BatchProcessor::Error }
     it { is_expected.to have_prototype_name "NotAborted" }
+    it { is_expected.to conjugate_into BatchProcessor::Malfunction::NotAborted }
   end
 
   describe described_class::NotStartedError do
     it { is_expected.to inherit_from BatchProcessor::Error }
     it { is_expected.to have_prototype_name "NotStarted" }
+    it { is_expected.to conjugate_into BatchProcessor::Malfunction::NotStarted }
   end
 end
