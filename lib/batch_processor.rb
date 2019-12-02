@@ -7,6 +7,7 @@ require "spicery"
 require "malfunction"
 
 require "batch_processor/malfunction/base"
+require "batch_processor/malfunction/collection_empty"
 
 require "batch_processor/version"
 require "batch_processor/batch_job"
