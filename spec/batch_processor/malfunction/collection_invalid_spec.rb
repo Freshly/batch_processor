@@ -27,18 +27,17 @@ RSpec.describe BatchProcessor::Malfunction::CollectionInvalid, type: :malfunctio
     let(:bar_presence_error) do
       Malfunction::AttributeError.new(attribute_name: :bar, error_code: :blank, message: "can't be blank")
     end
+    let(:example_collection_class) do
+      Class.new(example_batch_class::BatchCollection) do
+        argument :foo
+        option :bar
 
-    before do
-      example_batch_class::Collection.tap do |klass|
-        klass.__send__(:argument, :foo)
-        klass.__send__(:option, :bar)
-
-        klass.validates :foo, numericality: { only_integer: true }
-        klass.validates :bar, presence: true
+        validates :foo, numericality: { only_integer: true }
+        validates :bar, presence: true
       end
-
-      example_batch.collection.valid?
     end
+
+    before { example_batch.collection.valid? }
 
     it "sets attribute errors" do
       expect { _build }.to change { malfunction.attribute_errors }.to(array_including(*expected_attribute_errors))
