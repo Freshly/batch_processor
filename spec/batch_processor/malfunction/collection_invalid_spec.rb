@@ -12,6 +12,7 @@ RSpec.describe BatchProcessor::Malfunction::CollectionInvalid, type: :malfunctio
 
   it { is_expected.to use_attribute_errors }
   it { is_expected.to contextualize_as :collection }
+  it { is_expected.to have_default_problem }
 
   it { is_expected.to delegate_method(:errors).to(:collection).with_prefix }
 

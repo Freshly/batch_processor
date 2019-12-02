@@ -41,34 +41,34 @@ RSpec.describe BatchProcessor do
     it { is_expected.to conjugate_into BatchProcessor::Malfunction::CollectionInvalid }
   end
 
-  describe described_class::AlreadyExistsError do
-    it { is_expected.to inherit_from BatchProcessor::Error }
-    it { is_expected.to have_prototype_name "AlreadyExists" }
-  end
-
   describe described_class::AlreadyStartedError do
     it { is_expected.to inherit_from BatchProcessor::Error }
     it { is_expected.to have_prototype_name "AlreadyStarted" }
+    it { is_expected.to conjugate_into BatchProcessor::Malfunction::AlreadyStarted }
   end
 
   describe described_class::AlreadyEnqueuedError do
     it { is_expected.to inherit_from BatchProcessor::Error }
     it {is_expected.to have_prototype_name "AlreadyEnqueued" }
+    it { is_expected.to conjugate_into BatchProcessor::Malfunction::AlreadyEnqueued }
   end
 
   describe described_class::AlreadyAbortedError do
     it { is_expected.to inherit_from BatchProcessor::Error }
     it { is_expected.to have_prototype_name "AlreadyAborted" }
+    it { is_expected.to conjugate_into BatchProcessor::Malfunction::AlreadyAborted }
   end
 
   describe described_class::AlreadyClearedError do
     it { is_expected.to inherit_from BatchProcessor::Error }
     it { is_expected.to have_prototype_name "AlreadyCleared" }
+    it { is_expected.to conjugate_into BatchProcessor::Malfunction::AlreadyCleared }
   end
 
   describe described_class::AlreadyFinishedError do
     it { is_expected.to inherit_from BatchProcessor::Error }
     it { is_expected.to have_prototype_name "AlreadyFinished" }
+    it { is_expected.to conjugate_into BatchProcessor::Malfunction::AlreadyFinished }
   end
 
   describe described_class::StillProcessingError do
