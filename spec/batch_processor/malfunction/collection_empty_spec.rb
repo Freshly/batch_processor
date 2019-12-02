@@ -6,6 +6,7 @@ RSpec.describe BatchProcessor::Malfunction::CollectionEmpty, type: :malfunction 
   it { is_expected.to inherit_from BatchProcessor::Malfunction::Base }
 
   it { is_expected.to have_prototype_name "CollectionEmpty" }
+  it { is_expected.to conjugate_into BatchProcessor::CollectionEmptyError }
 
   it { is_expected.not_to use_attribute_errors }
   it { is_expected.not_to be_contextualized }
