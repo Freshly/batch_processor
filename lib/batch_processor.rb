@@ -20,7 +20,11 @@ require "batch_processor/collection"
 require "batch_processor/batch_base"
 
 module BatchProcessor
-  class Error < StandardError; end
+  class Error < StandardError
+    include Conjunction::Junction
+    prefixed_with "BatchProcessor::"
+    suffixed_with "Error"
+  end
 
   class NotFoundError < Error; end
   class ClassMissingError < Error; end

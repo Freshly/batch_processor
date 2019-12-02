@@ -8,6 +8,7 @@ RSpec.describe BatchProcessor::Malfunction::CollectionInvalid, type: :malfunctio
   it { is_expected.to inherit_from BatchProcessor::Malfunction::Base }
 
   it { is_expected.to have_prototype_name "CollectionInvalid" }
+  it { is_expected.to conjugate_into BatchProcessor::CollectionInvalidError }
 
   it { is_expected.to use_attribute_errors }
   it { is_expected.to contextualize_as :collection }
