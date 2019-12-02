@@ -84,18 +84,28 @@ RSpec.describe BatchProcessor::Batch::Processor, type: :module do
 
     context "with error" do
       before do
-        allow(example_batch).to receive(:process!).and_raise StandardError
+        allow(example_batch).to receive(:process!).and_raise error_class
         allow(example_batch).to receive(:error).and_call_original
       end
 
-      it "calls logs the exception without raising" do
-        process
-        expect(example_batch).
-          to have_received(:error).
-          with(:process_error, exception: instance_of(StandardError))
+      context "when StandardError" do
+        let(:error_class) { StandardError }
+
+        it "raises" do
+          expect { process }.to raise_error error_class
+        end
       end
 
-      it { is_expected.to eq example_batch }
+      context "when BatchProcessor::Error" do
+        let(:error_class) { BatchProcessor::Error }
+
+        it "calls logs the exception without raising" do
+          process
+          expect(example_batch).to have_received(:error).with(:process_error, exception: instance_of(error_class))
+        end
+
+        it { is_expected.to eq example_batch }
+      end
     end
 
     context "without error" do
