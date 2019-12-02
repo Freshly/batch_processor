@@ -4,6 +4,9 @@ require "active_support"
 require "active_job"
 
 require "spicery"
+require "malfunction"
+
+require "batch_processor/malfunction/base"
 
 require "batch_processor/version"
 require "batch_processor/batch_job"

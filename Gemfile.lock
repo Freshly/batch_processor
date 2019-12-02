@@ -1,4 +1,13 @@
 GIT
+  remote: https://github.com/freshly/malfunction.git
+  revision: 6d1d8d77b68baabb06be9d38e4c54fcf183eeeac
+  ref: develop
+  specs:
+    malfunction (0.1.0)
+      activesupport (~> 5.2.1)
+      spicery (>= 0.19.0, < 1.0)
+
+GIT
   remote: https://github.com/freshly/spicerack.git
   revision: edfa87e837b8628c7ec11a2a2ae289f16b633960
   ref: conjunction/configuration
@@ -57,6 +66,7 @@ PATH
     batch_processor (0.3.0)
       activejob (~> 5.2.1)
       activesupport (~> 5.2.1)
+      malfunction (>= 0.1.0, < 1.0)
       redis (>= 3.0)
       spicery (>= 0.19.2, < 1.0)
 
@@ -186,6 +196,7 @@ DEPENDENCIES
   batch_processor!
   bundler (~> 2.0.1)
   faker (~> 1.8)
+  malfunction!
   pry-byebug (>= 3.7.0)
   rake (~> 10.0)
   rspec (~> 3.0)
