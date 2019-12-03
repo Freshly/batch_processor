@@ -88,6 +88,18 @@ RSpec.describe BatchProcessor::Batch::Processor, type: :module do
         allow(example_batch).to receive(:error).and_call_original
       end
 
+      shared_examples_for "the expected malfunction is set" do
+        it "has expected malfunction" do
+          expect { process }.to change { example_batch.malfunction }.to(an_instance_of(expected_malfunction_class))
+        end
+      end
+
+      shared_examples_for "no malfunction is set" do
+        it "doesn't have a malfunction" do
+          expect { process }.not_to change { example_batch.malfunction }.from(nil)
+        end
+      end
+
       context "when StandardError" do
         let(:error_class) { StandardError }
 
@@ -96,7 +108,7 @@ RSpec.describe BatchProcessor::Batch::Processor, type: :module do
         end
       end
 
-      context "when BatchProcessor::Error" do
+      context "when basic BatchProcessor::Error" do
         let(:error_class) { BatchProcessor::Error }
 
         it "calls logs the exception without raising" do
@@ -105,6 +117,88 @@ RSpec.describe BatchProcessor::Batch::Processor, type: :module do
         end
 
         it { is_expected.to eq example_batch }
+
+        it_behaves_like "no malfunction is set"
+      end
+
+      context "when BatchProcessor::CollectionInvalidError" do
+        let(:error_class) { BatchProcessor::CollectionInvalidError }
+
+        it "calls logs the exception without raising" do
+          expect { process }.
+            to change { example_batch.malfunction }.to(an_instance_of(BatchProcessor::Malfunction::CollectionInvalid)).
+            and change { example_batch.malfunction&.collection }.to(example_batch.collection)
+        end
+      end
+
+      context "when BatchProcessor::CollectionEmptyError" do
+        let(:error_class) { BatchProcessor::CollectionEmptyError }
+        let(:expected_malfunction_class) { BatchProcessor::Malfunction::CollectionEmpty }
+
+        it_behaves_like "the expected malfunction is set"
+      end
+
+      context "when BatchProcessor::AlreadyAbortedError" do
+        let(:error_class) { BatchProcessor::AlreadyAbortedError }
+        let(:expected_malfunction_class) { BatchProcessor::Malfunction::AlreadyAborted }
+
+        it_behaves_like "the expected malfunction is set"
+      end
+
+      context "when BatchProcessor::AlreadyClearedError" do
+        let(:error_class) { BatchProcessor::AlreadyClearedError }
+        let(:expected_malfunction_class) { BatchProcessor::Malfunction::AlreadyCleared }
+
+        it_behaves_like "the expected malfunction is set"
+      end
+
+      context "when BatchProcessor::AlreadyEnqueuedError" do
+        let(:error_class) { BatchProcessor::AlreadyEnqueuedError }
+        let(:expected_malfunction_class) { BatchProcessor::Malfunction::AlreadyEnqueued }
+
+        it_behaves_like "the expected malfunction is set"
+      end
+
+      context "when BatchProcessor::AlreadyFinishedError" do
+        let(:error_class) { BatchProcessor::AlreadyFinishedError }
+        let(:expected_malfunction_class) { BatchProcessor::Malfunction::AlreadyFinished }
+
+        it_behaves_like "the expected malfunction is set"
+      end
+
+      context "when BatchProcessor::AlreadyStartedError" do
+        let(:error_class) { BatchProcessor::AlreadyStartedError }
+        let(:expected_malfunction_class) { BatchProcessor::Malfunction::AlreadyStarted }
+
+        it_behaves_like "the expected malfunction is set"
+      end
+
+      context "when BatchProcessor::NotAbortedError" do
+        let(:error_class) { BatchProcessor::NotAbortedError }
+        let(:expected_malfunction_class) { BatchProcessor::Malfunction::NotAborted }
+
+        it_behaves_like "the expected malfunction is set"
+      end
+
+      context "when BatchProcessor::NotProcessingError" do
+        let(:error_class) { BatchProcessor::NotProcessingError }
+        let(:expected_malfunction_class) { BatchProcessor::Malfunction::NotProcessing }
+
+        it_behaves_like "the expected malfunction is set"
+      end
+
+      context "when BatchProcessor::NotStartedError" do
+        let(:error_class) { BatchProcessor::NotStartedError }
+        let(:expected_malfunction_class) { BatchProcessor::Malfunction::NotStarted }
+
+        it_behaves_like "the expected malfunction is set"
+      end
+
+      context "when BatchProcessor::StillProcessingError" do
+        let(:error_class) { BatchProcessor::StillProcessingError }
+        let(:expected_malfunction_class) { BatchProcessor::Malfunction::StillProcessing }
+
+        it_behaves_like "the expected malfunction is set"
       end
     end
 

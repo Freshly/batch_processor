@@ -11,7 +11,7 @@ module BatchProcessor
 
       private
 
-      def build_malfunction(malfunction_class, context)
+      def build_malfunction(malfunction_class, context = nil)
         @malfunction = malfunction_class.build(context)
       end
     end
