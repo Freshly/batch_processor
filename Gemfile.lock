@@ -9,8 +9,8 @@ GIT
 
 GIT
   remote: https://github.com/freshly/spicerack.git
-  revision: edfa87e837b8628c7ec11a2a2ae289f16b633960
-  ref: conjunction/configuration
+  revision: b03377cff799cac202fd4752cb510709556e6e3a
+  ref: nil-tolerant-conjunction
   specs:
     around_the_world (0.19.2)
       activesupport (>= 5.2.1)
@@ -177,7 +177,7 @@ GEM
     ruby-progressbar (1.10.1)
     shoulda-matchers (4.0.1)
       activesupport (>= 4.2.0)
-    simplecov (0.16.1)
+    simplecov (0.17.1)
       docile (~> 1.1)
       json (>= 1.8, < 3)
       simplecov-html (~> 0.10.0)
@@ -208,4 +208,4 @@ DEPENDENCIES
   timecop (>= 0.9.1)
 
 BUNDLED WITH
-   2.0.1
+   2.0.2
