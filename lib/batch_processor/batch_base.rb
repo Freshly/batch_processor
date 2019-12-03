@@ -2,6 +2,7 @@
 
 require_relative "batch/core"
 require_relative "batch/job"
+require_relative "batch/malfunction"
 require_relative "batch/processor"
 require_relative "batch/predicates"
 require_relative "batch/controller"
@@ -18,6 +19,7 @@ module BatchProcessor
 
     include BatchProcessor::Batch::Core
     include BatchProcessor::Batch::Job
+    include BatchProcessor::Batch::Malfunction
     include BatchProcessor::Batch::Processor
     include BatchProcessor::Batch::Predicates
     include BatchProcessor::Batch::Controller

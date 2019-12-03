@@ -7,7 +7,7 @@ module BatchProcessor
       contextualize :collection
       delegate :errors, to: :collection, prefix: true
 
-      def build
+      on_build do
         collection_errors.details.each do |attribute_name, error_details|
           attribute_messages = collection_errors.messages[attribute_name]
 
