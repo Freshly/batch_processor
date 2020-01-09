@@ -6,7 +6,7 @@ require "simplecov"
 
 require "timecop"
 
-require "spicerack/spec_helper"
+require "spicery/spec_helper"
 require "shoulda-matchers"
 
 SimpleCov.start do
