@@ -4,6 +4,20 @@ require "active_support"
 require "active_job"
 
 require "spicery"
+require "malfunction"
+
+require "batch_processor/malfunction/base"
+require "batch_processor/malfunction/collection_empty"
+require "batch_processor/malfunction/collection_invalid"
+require "batch_processor/malfunction/already_started"
+require "batch_processor/malfunction/already_enqueued"
+require "batch_processor/malfunction/already_finished"
+require "batch_processor/malfunction/already_aborted"
+require "batch_processor/malfunction/already_cleared"
+require "batch_processor/malfunction/still_processing"
+require "batch_processor/malfunction/not_processing"
+require "batch_processor/malfunction/not_aborted"
+require "batch_processor/malfunction/not_started"
 
 require "batch_processor/version"
 require "batch_processor/batch_job"
@@ -15,13 +29,16 @@ require "batch_processor/collection"
 require "batch_processor/batch_base"
 
 module BatchProcessor
-  class Error < StandardError; end
+  class Error < StandardError
+    include Conjunction::Junction
+    prefixed_with "BatchProcessor::"
+    suffixed_with "Error"
+  end
 
   class NotFoundError < Error; end
   class ClassMissingError < Error; end
   class CollectionEmptyError < Error; end
   class CollectionInvalidError < Error; end
-  class AlreadyExistsError < Error; end
   class AlreadyStartedError < Error; end
   class AlreadyEnqueuedError < Error; end
   class AlreadyFinishedError < Error; end

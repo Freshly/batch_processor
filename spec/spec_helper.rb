@@ -7,6 +7,8 @@ require "simplecov"
 require "timecop"
 
 require "spicery/spec_helper"
+require "malfunction/spec_helper"
+
 require "shoulda-matchers"
 
 SimpleCov.start do

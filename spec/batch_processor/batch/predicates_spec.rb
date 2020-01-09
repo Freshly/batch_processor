@@ -118,4 +118,20 @@ RSpec.describe BatchProcessor::Batch::Predicates, type: :module do
       end
     end
   end
+
+  describe "#malfunction?" do
+    subject { example_batch }
+
+    context "with malfunction" do
+      let(:malfunction) { instance_double(BatchProcessor::Malfunction::Base) }
+
+      before { allow(example_batch).to receive(:malfunction).and_return(malfunction) }
+
+      it { is_expected.to be_malfunction }
+    end
+
+    context "without malfunction" do
+      it { is_expected.not_to be_malfunction }
+    end
+  end
 end
