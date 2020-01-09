@@ -21,7 +21,9 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "activejob", "~> 5.2.1"
   spec.add_runtime_dependency "activesupport", "~> 5.2.1"
   spec.add_runtime_dependency "redis", ">= 3.0"
+
   spec.add_runtime_dependency "spicery", ">= 0.20.4", "< 1.0"
+  spec.add_runtime_dependency "malfunction", ">= 0.1.1", "< 1.0"
 
   spec.add_development_dependency "bundler", "~> 2.0.1"
   spec.add_development_dependency "rake", "~> 10.0"

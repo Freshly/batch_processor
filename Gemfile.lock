@@ -4,6 +4,7 @@ PATH
     batch_processor (0.3.1)
       activejob (~> 5.2.1)
       activesupport (~> 5.2.1)
+      malfunction (>= 0.1.1, < 1.0)
       redis (>= 3.0)
       spicery (>= 0.20.4, < 1.0)
 
@@ -67,6 +68,9 @@ GEM
     loofah (2.4.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
+    malfunction (0.1.1)
+      activesupport (~> 5.2.1)
+      spicery (>= 0.20.4, < 1.0)
     method_source (0.9.2)
     mini_portile2 (2.4.0)
     minitest (5.13.0)

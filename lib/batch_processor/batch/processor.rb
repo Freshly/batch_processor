@@ -62,9 +62,15 @@ module BatchProcessor
 
       def process
         process!
-      rescue StandardError => exception
-        error :process_error, exception: exception
+      rescue BatchProcessor::Error => exception
+        handle_exception(exception)
         self
+      end
+
+      private
+
+      def handle_exception(exception)
+        error :process_error, exception: exception
       end
     end
   end
