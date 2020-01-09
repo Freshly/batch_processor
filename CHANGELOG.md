@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.0
+
+*Release Date*: 1/09/2020
+
+- Use `Malfunction` gem
+
 ## v0.3.1
 
 *Release Date*: 1/09/2020

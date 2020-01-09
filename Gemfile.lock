@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    batch_processor (0.3.1)
+    batch_processor (0.4.0)
       activejob (~> 5.2.1)
       activesupport (~> 5.2.1)
       malfunction (>= 0.1.1, < 1.0)
