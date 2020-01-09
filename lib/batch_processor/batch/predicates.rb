@@ -18,6 +18,10 @@ module BatchProcessor
         started? && !aborted? && !finished?
       end
 
+      def malfunction?
+        malfunction.present?
+      end
+
       class_methods do
         private
 

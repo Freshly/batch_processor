@@ -70,7 +70,14 @@ module BatchProcessor
       private
 
       def handle_exception(exception)
-        error :process_error, exception: exception
+        malfunction_class = exception.try(:conjugate, BatchProcessor::Malfunction::Base)
+        error :process_error, exception: exception and return if malfunction_class.nil?
+
+        if malfunction_class <= BatchProcessor::Malfunction::CollectionInvalid
+          build_malfunction malfunction_class, collection
+        else
+          build_malfunction malfunction_class
+        end
       end
     end
   end
