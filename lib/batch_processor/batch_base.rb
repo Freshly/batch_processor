@@ -13,6 +13,9 @@ module BatchProcessor
     class BatchCollection < BatchProcessor::Collection; end
     class Collection < BatchCollection; end
 
+    include Conjunction::Junction
+    suffixed_with "Batch"
+
     include BatchProcessor::Batch::Core
     include BatchProcessor::Batch::Job
     include BatchProcessor::Batch::Processor
