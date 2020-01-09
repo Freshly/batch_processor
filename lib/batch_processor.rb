@@ -3,7 +3,7 @@
 require "active_support"
 require "active_job"
 
-require "spicerack"
+require "spicery"
 
 require "batch_processor/version"
 require "batch_processor/batch_job"

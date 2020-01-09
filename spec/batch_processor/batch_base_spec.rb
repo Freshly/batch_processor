@@ -1,7 +1,13 @@
 # frozen_string_literal: true
 
 RSpec.describe BatchProcessor::BatchBase, type: :batch do
+  subject { described_class }
+
   it { is_expected.to inherit_from Spicerack::InputObject }
+
+  it { is_expected.to include_module Conjunction::Junction }
+  it { is_expected.to have_conjunction_suffix "Batch" }
+  it { is_expected.to have_junction_key :batch }
 
   it { is_expected.to include_module BatchProcessor::Batch::Core }
   it { is_expected.to include_module BatchProcessor::Batch::Job }
